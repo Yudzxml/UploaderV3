@@ -124,9 +124,16 @@ module.exports = async (req, res) => {
       return res.end(JSON.stringify({ success: false, message: 'No file uploaded' }));
     }
 
-    const file = files.file;
-    const filePath = file.filepath;
-    const fileName = file.originalFilename;
+    let file = files.file;
+if (Array.isArray(file)) file = file[0];
+
+const filePath = file.filepath;
+const fileName = file.originalFilename;
+
+if (!filePath || typeof filePath !== 'string') {
+  res.statusCode = 400;
+  return res.end(JSON.stringify({ success: false, message: 'Invalid file path' }));
+}
 
     const uploadFunctions = [
       uploadToUguu,
@@ -167,4 +174,4 @@ module.exports = async (req, res) => {
       }),
     );
   }
-}
+};

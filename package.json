@@ -1,0 +1,11 @@
+{
+  "name": "Uploader",
+  "version": "1.0.0",
+  "description": "File uploader API for Vercel with multi-host targets",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.6.8",
+    "form-data": "^4.0.0",
+    "formidable": "^3.6.2"
+  }
+}

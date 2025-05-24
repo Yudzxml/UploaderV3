@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>File Uploader</title>
+  <title>YUDZ UPLOADER</title>
   <style>
     * {
       box-sizing: border-box;
@@ -83,6 +83,25 @@
       background: #0099cc;
     }
 
+    .copy-btn {
+      background: transparent;
+      border: 2px solid #00ffcc;
+      color: #00ffcc;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s ease-in-out;
+      margin-top: 10px;
+      box-shadow: 0 0 10px #00ffcc;
+    }
+
+    .copy-btn:hover {
+      background: #00ffcc;
+      color: #0d0d1a;
+      box-shadow: 0 0 20px #00ffcc;
+    }
+
     #result, #error {
       margin-top: 20px;
       max-width: 450px;
@@ -144,7 +163,7 @@
   </style>
 </head>
 <body>
-  <h2>Upload File</h2>
+  <h2>FILE UPLOAD</h2>
   <form id="uploadForm">
     <input type="file" name="file" required />
     <button type="submit">Upload</button>
@@ -181,7 +200,13 @@
         loader.style.display = 'none';
 
         if (response.ok && data?.result?.url) {
-          resultDiv.innerHTML = `File URL: <a href="${data.result.url}" target="_blank">${data.result.url}</a>`;
+          const url = data.result.url;
+          resultDiv.innerHTML = `
+            <div>
+              File URL: <a href="${url}" target="_blank">${url}</a><br><br>
+              <button class="copy-btn" onclick="copyToClipboard('${url}')">Copy URL</button>
+            </div>
+          `;
         } else {
           errorDiv.textContent = data.message || 'Upload failed';
         }
@@ -190,6 +215,14 @@
         errorDiv.textContent = 'Error: ' + err.message;
       }
     });
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('URL copied to clipboard!');
+      }).catch((err) => {
+        alert('Failed to copy: ' + err);
+      });
+    }
   </script>
 </body>
 </html>

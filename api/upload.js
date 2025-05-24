@@ -111,8 +111,20 @@ function parseForm(req) {
 }
 
 module.exports = async (req, res) => {
+  // CORS headers - izinkan POST dan OPTIONS (preflight)
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle preflight request (OPTIONS)
+  if (req.method === 'OPTIONS') {
+    res.statusCode = 204;
+    return res.end();
+  }
+
   if (req.method !== 'POST') {
     res.statusCode = 405;
+    res.setHeader('Content-Type', 'application/json');
     return res.end(JSON.stringify({ success: false, message: 'Method not allowed' }));
   }
 
@@ -121,19 +133,21 @@ module.exports = async (req, res) => {
 
     if (!files.file) {
       res.statusCode = 400;
+      res.setHeader('Content-Type', 'application/json');
       return res.end(JSON.stringify({ success: false, message: 'No file uploaded' }));
     }
 
     let file = files.file;
-if (Array.isArray(file)) file = file[0];
+    if (Array.isArray(file)) file = file[0];
 
-const filePath = file.filepath;
-const fileName = file.originalFilename;
+    const filePath = file.filepath || file.path;
+    const fileName = file.originalFilename || file.name;
 
-if (!filePath || typeof filePath !== 'string') {
-  res.statusCode = 400;
-  return res.end(JSON.stringify({ success: false, message: 'Invalid file path' }));
-}
+    if (!filePath || typeof filePath !== 'string') {
+      res.statusCode = 400;
+      res.setHeader('Content-Type', 'application/json');
+      return res.end(JSON.stringify({ success: false, message: 'Invalid file path' }));
+    }
 
     const uploadFunctions = [
       uploadToUguu,
@@ -158,6 +172,7 @@ if (!filePath || typeof filePath !== 'string') {
 
     // Kalau semua gagal:
     res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
     return res.end(
       JSON.stringify({
         success: false,
@@ -167,6 +182,7 @@ if (!filePath || typeof filePath !== 'string') {
     );
   } catch (err) {
     res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
     return res.end(
       JSON.stringify({
         success: false,

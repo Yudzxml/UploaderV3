@@ -26,9 +26,7 @@ async function uploadToUguu(filePath, fileName) {
   return {
     success: true,
     author: 'Yudzxml',
-    result: {
-      url: response.data.files[0],
-    },
+    result: response.data.files[0]
   };
 }
 

@@ -174,74 +174,88 @@
   <div id="toast"></div>
   <footer>&copy; 2025 Yudzxml. All rights reserved.</footer>
 
-  <script>
-    const form = document.getElementById('uploadForm');
-    const resultDiv = document.getElementById('result');
-    const errorDiv = document.getElementById('error');
-    const loader = document.getElementById('loader');
-    const toast = document.getElementById('toast');
+<script>
+  const form = document.getElementById('uploadForm');
+  const resultDiv = document.getElementById('result');
+  const errorDiv = document.getElementById('error');
+  const loader = document.getElementById('loader');
+  const toast = document.getElementById('toast');
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      resultDiv.innerHTML = '';
-      errorDiv.textContent = '';
-      loader.style.display = 'block';
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    console.log('Form submitted');
 
-      const fileInput = form.querySelector('input[type="file"]');
-      const file = fileInput.files[0];
+    resultDiv.innerHTML = '';
+    errorDiv.textContent = '';
+    loader.style.display = 'block';
 
-      if (file.size > 100 * 1024 * 1024) {
-        loader.style.display = 'none';
-        errorDiv.textContent = 'File terlalu besar. Maksimum 100MB.';
-        return;
-      }
+    const fileInput = form.querySelector('input[type="file"]');
+    const file = fileInput.files[0];
+    console.log('Selected file:', file);
 
-      const formData = new FormData();
-      formData.append('file', file);
+    if (file.size > 100 * 1024 * 1024) {
+      loader.style.display = 'none';
+      errorDiv.textContent = 'File terlalu besar. Maksimum 100MB.';
+      console.log('File size too large:', file.size);
+      return;
+    }
 
-      try {
-        const response = await fetch('api/upload', {
-          method: 'POST',
-          body: formData,
-        });
+    const formData = new FormData();
+    formData.append('file', file);
+    console.log('FormData prepared');
 
-        const data = await response.json();
-        loader.style.display = 'none';
-
-        const url = data?.result?.url;
-        if (response.ok && url) {
-          resultDiv.innerHTML = `
-            <p><strong>URL:</strong> <a href="${url}" target="_blank">${url}</a></p>
-            <button id="copyBtn">Copy URL</button>
-          `;
-
-          document.getElementById('copyBtn').addEventListener('click', () => {
-            copyToClipboard(url);
-          });
-        } else {
-          errorDiv.textContent = data.message || 'Upload failed';
-        }
-      } catch (err) {
-        loader.style.display = 'none';
-        errorDiv.textContent = 'Error: ' + err.message;
-      }
-    });
-
-    function copyToClipboard(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        showToast('URL copied to clipboard!');
-      }).catch((err) => {
-        showToast('Failed to copy: ' + err);
+    try {
+      const response = await fetch('https://api-yudzxml.vercel.app/api/upload', {
+        method: 'POST',
+        body: formData,
       });
-    }
+      console.log('Fetch response received:', response);
 
-    function showToast(message) {
-      toast.textContent = message;
-      toast.style.display = 'block';
-      setTimeout(() => {
-        toast.style.display = 'none';
-      }, 3000);
+      const data = await response.json();
+      console.log('Response JSON:', data);
+      loader.style.display = 'none';
+
+      const url = data?.result?.url;
+      if (response.ok && url) {
+        console.log('Upload successful, URL:', url);
+        resultDiv.innerHTML = `
+          <p><strong>URL:</strong> <a href="${url}" target="_blank">${url}</a></p>
+          <button id="copyBtn">Copy URL</button>
+        `;
+
+        document.getElementById('copyBtn').addEventListener('click', () => {
+          copyToClipboard(url);
+        });
+      } else {
+        console.error('Upload failed or URL missing:', data);
+        errorDiv.textContent = data.message || 'Upload failed';
+      }
+    } catch (err) {
+      loader.style.display = 'none';
+      errorDiv.textContent = 'Error: ' + err.message;
+      console.error('Exception caught during upload:', err);
     }
-  </script>
+  });
+
+  function copyToClipboard(text) {
+    console.log('Copying to clipboard:', text);
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('URL copied to clipboard!');
+    }).catch((err) => {
+      console.error('Clipboard copy failed:', err);
+      showToast('Failed to copy: ' + err);
+    });
+  }
+
+  function showToast(message) {
+    console.log('Showing toast message:', message);
+    toast.textContent = message;
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+      console.log('Toast hidden');
+    }, 3000);
+  }
+</script>
 </body>
 </html>

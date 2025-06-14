@@ -9,6 +9,7 @@ exports.config = {
   },
 };
 
+// UPLOAD FUNCTIONS
 async function uploadToUguu(filePath, fileName) {
   const form = new FormData();
   form.append('files[]', fs.createReadStream(filePath), fileName);
@@ -23,10 +24,12 @@ async function uploadToUguu(filePath, fileName) {
     data: form,
   });
 
+  console.log('[UGUU] Upload success:', response.data.files[0]);
+
   return {
     success: true,
     author: 'Yudzxml',
-    result: response.data.files[0]
+    result: response.data.files[0],
   };
 }
 
@@ -37,6 +40,8 @@ async function uploadToSupa(filePath, fileName) {
   const response = await axios.post('https://i.supa.codes/api/upload', form, {
     headers: form.getHeaders(),
   });
+
+  console.log('[SUPA] Upload success:', response.data.link);
 
   return {
     success: true,
@@ -61,6 +66,8 @@ async function uploadToAutoresbot(filePath, fileName) {
       'User-Agent': 'Mozilla/5.0',
     },
   });
+
+  console.log('[AUTORESBOT] Upload success:', response.data.fileUrl);
 
   return {
     success: true,
@@ -87,6 +94,8 @@ async function uploadToCatbox(filePath, fileName) {
     },
   });
 
+  console.log('[CATBOX] Upload success:', response.data);
+
   return {
     success: true,
     author: 'Yudzxml',
@@ -97,6 +106,7 @@ async function uploadToCatbox(filePath, fileName) {
   };
 }
 
+// Parse Form
 function parseForm(req) {
   return new Promise((resolve, reject) => {
     const form = new formidable.IncomingForm();
@@ -108,13 +118,13 @@ function parseForm(req) {
   });
 }
 
+// MAIN HANDLER
 module.exports = async (req, res) => {
-  // CORS headers - izinkan POST dan OPTIONS (preflight)
+  // CORS setup
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight request (OPTIONS)
   if (req.method === 'OPTIONS') {
     res.statusCode = 204;
     return res.end();
@@ -122,16 +132,16 @@ module.exports = async (req, res) => {
 
   if (req.method !== 'POST') {
     res.statusCode = 405;
-    res.setHeader('Content-Type', 'application/json');
     return res.end(JSON.stringify({ success: false, message: 'Method not allowed' }));
   }
 
   try {
+    console.log('[SERVER] Parsing upload form...');
     const { files } = await parseForm(req);
 
     if (!files.file) {
+      console.log('[ERROR] No file received');
       res.statusCode = 400;
-      res.setHeader('Content-Type', 'application/json');
       return res.end(JSON.stringify({ success: false, message: 'No file uploaded' }));
     }
 
@@ -141,51 +151,52 @@ module.exports = async (req, res) => {
     const filePath = file.filepath || file.path;
     const fileName = file.originalFilename || file.name;
 
-    if (!filePath || typeof filePath !== 'string') {
+    if (!filePath) {
+      console.log('[ERROR] Invalid file path');
       res.statusCode = 400;
-      res.setHeader('Content-Type', 'application/json');
       return res.end(JSON.stringify({ success: false, message: 'Invalid file path' }));
     }
 
+    console.log(`[UPLOAD] Starting upload: ${fileName}`);
+
     const uploadFunctions = [
-      uploadToUguu,
       uploadToSupa,
+      uploadToUguu,
       uploadToAutoresbot,
       uploadToCatbox,
     ];
 
     let lastError = null;
 
-    for (const uploadFunc of uploadFunctions) {
+    for (const func of uploadFunctions) {
       try {
-        const result = await uploadFunc(filePath, fileName);
+        const result = await func(filePath, fileName);
         if (result && result.success) {
+          console.log('[SUCCESS] File uploaded via:', func.name);
           res.setHeader('Content-Type', 'application/json');
           return res.end(JSON.stringify(result));
         }
-      } catch (error) {
-        lastError = error;
+      } catch (err) {
+        console.error(`[FAILURE] ${func.name} failed:`, err.message);
+        lastError = err;
       }
     }
 
-    // Kalau semua gagal:
     res.statusCode = 500;
-    res.setHeader('Content-Type', 'application/json');
     return res.end(
       JSON.stringify({
         success: false,
-        message:
-          (lastError && lastError.message) || 'All upload attempts failed',
-      }),
+        message: lastError?.message || 'All upload attempts failed',
+      })
     );
   } catch (err) {
+    console.error('[SERVER ERROR]', err.message);
     res.statusCode = 500;
-    res.setHeader('Content-Type', 'application/json');
     return res.end(
       JSON.stringify({
         success: false,
         message: err.message || 'Internal Server Error',
-      }),
+      })
     );
   }
 };

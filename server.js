@@ -77,6 +77,8 @@ app.get('/upload', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Missing ?url' });
   }
 
+  console.log('[Proxy Upload] Downloading from:', imageUrl);
+
   try {
     const tmpFile = tmp.fileSync({ postfix: '.jpg' });
     const writer = fs.createWriteStream(tmpFile.name);
@@ -92,6 +94,8 @@ app.get('/upload', async (req, res) => {
       },
     });
 
+    console.log('[Proxy Upload] Response headers:', response.headers);
+
     response.data.pipe(writer);
 
     await new Promise((resolve, reject) => {
@@ -104,22 +108,31 @@ app.get('/upload', async (req, res) => {
     if (!ext || ext.length > 5) ext = '.jpg';
 
     const fileName = `image-${Date.now()}${ext}`;
+
+    console.log('[Proxy Upload] Saved to temp file:', tmpFile.name);
+    console.log('[Proxy Upload] Temp file name for upload:', fileName);
+
     const uploadResult = await uploadToUguu(tmpFile.name, fileName);
 
     tmpFile.removeCallback();
 
     if (uploadResult?.success) {
+      console.log('[Proxy Upload] Upload success via Uguu');
       return res.json({
         success: true,
         source: imageUrl,
-        uploaded: uploadResult.result,
+        uploaded: uploadResult.result.url,
         author: 'Yudzxml',
       });
     } else {
+      console.error('[Proxy Upload] Upload failed');
       return res.status(500).json({ success: false, message: 'Upload failed' });
     }
   } catch (err) {
     console.error('[Proxy Upload Error]', err.message);
+    if (err.response) {
+      console.error('[Proxy Upload Error Response]', err.response.status, err.response.data);
+    }
     return res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -127,33 +140,45 @@ app.get('/upload', async (req, res) => {
 // --- UPLOAD FUNCTIONS ---
 async function uploadToUguu(filePath, fileName) {
   try {
+    console.log('[uploadToUguu] File path:', filePath);
+    console.log('[uploadToUguu] File name:', fileName);
+
     const form = new FormData();
     form.append('files[]', fs.createReadStream(filePath), fileName);
 
+    const headers = {
+      ...form.getHeaders(),
+      'User-Agent': 'Mozilla/5.0',
+    };
+
+    console.log('[uploadToUguu] Headers:', headers);
+
     const response = await axios.post('https://uguu.se/upload', form, {
-      headers: {
-        ...form.getHeaders(),
-        'User-Agent': 'Mozilla/5.0',
-      },
+      headers,
       timeout: 15000,
       maxBodyLength: Infinity,
       maxContentLength: Infinity,
     });
+
+    console.log('[uploadToUguu] Raw response:', response.data);
 
     if (response.data && Array.isArray(response.data.files) && response.data.files.length > 0) {
       return {
         success: true,
         author: 'Yudzxml',
         result: {
-          url: response.data.files[0].result.url
-      }
-     }
+          url: response.data.files[0].url || response.data.files[0].name || 'unknown',
+        },
+      };
     } else {
-      console.error('Unexpected response:', response.data);
+      console.error('[uploadToUguu] Unexpected response structure:', response.data);
       throw new Error('Invalid response from Uguu');
     }
   } catch (error) {
     console.error('[uploadToUguu ERROR]', error.message);
+    if (error.response) {
+      console.error('[uploadToUguu ERROR] Response:', error.response.status, error.response.data);
+    }
     throw error;
   }
 }

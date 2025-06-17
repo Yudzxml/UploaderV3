@@ -130,19 +130,11 @@ async function uploadToUguu(filePath, fileName) {
     const form = new FormData();
     form.append('files[]', fs.createReadStream(filePath), fileName);
 
-    const headers = form.getHeaders();
-
-    // Optional: debug headers
-    console.log('Headers:', headers);
-
-    const response = await axios({
-      url: 'https://uguu.se/upload.php',
-      method: 'POST',
+    const response = await axios.post('https://uguu.se/upload', form, {
       headers: {
+        ...form.getHeaders(),
         'User-Agent': 'Mozilla/5.0',
-        ...headers,
       },
-      data: form,
       timeout: 15000,
       maxBodyLength: Infinity,
       maxContentLength: Infinity,
@@ -152,9 +144,12 @@ async function uploadToUguu(filePath, fileName) {
       return {
         success: true,
         author: 'Yudzxml',
-        result: response.data.files[0],
-      };
+        result: {
+          url: response.data.files[0].result.url
+      }
+     }
     } else {
+      console.error('Unexpected response:', response.data);
       throw new Error('Invalid response from Uguu');
     }
   } catch (error) {

@@ -80,9 +80,6 @@ app.get('/upload', async (req, res) => {
   console.log('[Proxy Upload] Downloading from:', imageUrl);
 
   try {
-    const tmpFile = tmp.fileSync({ postfix: '.jpg' });
-    const writer = fs.createWriteStream(tmpFile.name);
-
     const response = await axios({
       url: imageUrl,
       method: 'GET',
@@ -90,26 +87,43 @@ app.get('/upload', async (req, res) => {
       timeout: 10000,
       headers: {
         'User-Agent': 'Mozilla/5.0',
-        'Accept': 'image/jpeg,image/*,*/*;q=0.8',
+        'Accept': '*/*',
       },
     });
 
-    console.log('[Proxy Upload] Response headers:', response.headers);
+    const contentType = response.headers['content-type'];
+    console.log('[Proxy Upload] Content-Type:', contentType);
+
+    // Map content-type to file extension
+    const allowedTypes = {
+      'image/jpeg': '.jpg',
+      'image/png': '.png',
+      'image/gif': '.gif',
+      'image/webp': '.webp',
+      'video/mp4': '.mp4',
+      'audio/mpeg': '.mp3',
+      'audio/ogg': '.ogg',
+      'text/plain': '.txt',
+      'application/pdf': '.pdf',
+    };
+
+    const ext = allowedTypes[contentType];
+    if (!ext) {
+      return res.status(415).json({ success: false, message: `Unsupported content-type: ${contentType}` });
+    }
+
+    const tmpFile = tmp.fileSync({ postfix: ext });
+    const writer = fs.createWriteStream(tmpFile.name);
+
+    console.log('[Proxy Upload] Saving to temp file:', tmpFile.name);
 
     response.data.pipe(writer);
-
     await new Promise((resolve, reject) => {
       writer.on('finish', resolve);
       writer.on('error', reject);
     });
 
-    const urlPath = imageUrl.split('?')[0];
-    let ext = path.extname(urlPath);
-    if (!ext || ext.length > 5) ext = '.jpg';
-
-    const fileName = `image-${Date.now()}${ext}`;
-
-    console.log('[Proxy Upload] Saved to temp file:', tmpFile.name);
+    const fileName = `proxy-${Date.now()}${ext}`;
     console.log('[Proxy Upload] Temp file name for upload:', fileName);
 
     const uploadResult = await uploadToUguu(tmpFile.name, fileName);

@@ -5,9 +5,9 @@ const axios = require('axios');
 const FormData = require('form-data');
 const cors = require('cors');
 const path = require('path');
-const tmp = require('tmp');
 const app = express();
 const PORT = process.env.PORT || 3000;
+
 
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -70,29 +70,23 @@ app.post('/upload', (req, res) => {
     return res.status(500).json({ success: false, message: lastError?.message || 'All uploads failed' });
   });
 });
-
-app.get('/upload', async (req, res) => {
-  const imageUrl = req.query.url;
-  if (!imageUrl) {
-    return res.status(400).json({ success: false, message: 'Missing ?url' });
-  }
-
-  console.log('[Proxy Upload] Downloading from:', imageUrl);
-
+app.post('/v1/upload', async (req, res) => {
   try {
-    const response = await axios.get(imageUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)',
-        'Referer': 'https://www.google.com/',
-        'Referrer-Policy': 'strict-origin-when-cross-origin',
-        'Accept': '*/*',
-      },
+    const { url } = req.body;
+    if (!url) {
+      return res.status(400).json({ success: false, message: 'Missing URL' });
+    }
+
+    const response = await axios({
+      url,
+      method: 'GET',
       responseType: 'stream',
       timeout: 10000,
+      headers: {
+        'User-Agent': 'Mozilla/5.0',
+        Accept: '*/*',
+      },
     });
-
-    const contentType = response.headers['content-type'];
-    console.log('[Proxy Upload] Content-Type:', contentType);
 
     const allowedTypes = {
       'image/jpeg': '.jpg',
@@ -107,14 +101,15 @@ app.get('/upload', async (req, res) => {
       'application/x-zip-compressed': '.zip',
     };
 
-    // Check if content-type is allowed
+    const contentType = response.headers['content-type'];
     const ext = allowedTypes[contentType];
     if (!ext) {
-      console.warn(`[Proxy Upload] Unsupported content-type: ${contentType}`);
-      return res.status(415).json({ success: false, message: `Unsupported content-type: ${contentType}` });
+      return res.status(415).json({
+        success: false,
+        message: `Unsupported content-type: ${contentType}`,
+      });
     }
 
-    // Save to temp file
     const tmpFile = tmp.fileSync({ postfix: ext });
     const writer = fs.createWriteStream(tmpFile.name);
     response.data.pipe(writer);
@@ -124,35 +119,19 @@ app.get('/upload', async (req, res) => {
       writer.on('error', reject);
     });
 
-    const fileName = `proxy-${Date.now()}${ext}`;
-    console.log('[Proxy Upload] Temp file saved as:', fileName);
-
-    // Upload to Uguu
-    const uploadResult = await uploadToUguu(tmpFile.name, fileName);
+    const fileName = `remote-upload-${Date.now()}${ext}`;
+    const result = await uploadToUguu(tmpFile.name, fileName);
     tmpFile.removeCallback();
 
-    if (uploadResult?.success) {
-      console.log('[Proxy Upload] Upload success via Uguu');
-      return res.json({
-        success: true,
-        source: imageUrl,
-        uploaded: uploadResult.result.url,
-        type: contentType,
-        author: 'Yudzxml',
-      });
-    } else {
-      console.error('[Proxy Upload] Upload failed');
-      return res.status(500).json({ success: false, message: 'Upload failed' });
-    }
+    return res.json(result);
   } catch (err) {
-    console.error('[Proxy Upload Error]', err.message);
-    if (err.response) {
-      console.error('[Proxy Upload Error Response]', err.response.status, err.response.data);
-    }
-    return res.status(500).json({ success: false, message: err.message });
+    console.error('[URL Upload ERROR]', err.message);
+    return res.status(500).json({
+      success: false,
+      message: err.message || 'Upload failed',
+    });
   }
 });
-
 // --- UPLOAD FUNCTIONS ---
 async function uploadToUguu(filePath, fileName) {
   try {

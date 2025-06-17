@@ -11,6 +11,7 @@ const PORT = process.env.PORT || 3000;
 
 
 app.use(cors());
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -71,7 +72,8 @@ app.post('/upload', (req, res) => {
     return res.status(500).json({ success: false, message: lastError?.message || 'All uploads failed' });
   });
 });
-app.post('/v1/upload', async (req, res) => {
+
+app.post('/api/v1/upload', async (req, res) => {
   try {
     const { url } = req.body;
     if (!url) {

@@ -80,12 +80,16 @@ app.get('/upload', async (req, res) => {
   try {
     const tmpFile = tmp.fileSync({ postfix: '.jpg' });
     const writer = fs.createWriteStream(tmpFile.name);
+
     const response = await axios({
       url: imageUrl,
       method: 'GET',
       responseType: 'stream',
       timeout: 10000,
-      headers: { 'User-Agent': 'Mozilla/5.0' },
+      headers: {
+        'User-Agent': 'Mozilla/5.0',
+        'Accept': 'image/jpeg,image/*,*/*;q=0.8',
+      },
     });
 
     response.data.pipe(writer);
@@ -95,9 +99,13 @@ app.get('/upload', async (req, res) => {
       writer.on('error', reject);
     });
 
-    const ext = path.extname(imageUrl.split('?')[0]) || '.jpg';
+    const urlPath = imageUrl.split('?')[0];
+    let ext = path.extname(urlPath);
+    if (!ext || ext.length > 5) ext = '.jpg';
+
     const fileName = `image-${Date.now()}${ext}`;
     const uploadResult = await uploadToUguu(tmpFile.name, fileName);
+
     tmpFile.removeCallback();
 
     if (uploadResult?.success) {
@@ -122,15 +130,22 @@ async function uploadToUguu(filePath, fileName) {
     const form = new FormData();
     form.append('files[]', fs.createReadStream(filePath), fileName);
 
+    const headers = form.getHeaders();
+
+    // Optional: debug headers
+    console.log('Headers:', headers);
+
     const response = await axios({
       url: 'https://uguu.se/upload.php',
       method: 'POST',
       headers: {
         'User-Agent': 'Mozilla/5.0',
-        ...form.getHeaders(),
+        ...headers,
       },
       data: form,
       timeout: 15000,
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity,
     });
 
     if (response.data && Array.isArray(response.data.files) && response.data.files.length > 0) {
@@ -142,8 +157,9 @@ async function uploadToUguu(filePath, fileName) {
     } else {
       throw new Error('Invalid response from Uguu');
     }
-  } catch (e) {
-    throw e;
+  } catch (error) {
+    console.error('[uploadToUguu ERROR]', error.message);
+    throw error;
   }
 }
 

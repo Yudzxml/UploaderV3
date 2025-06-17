@@ -80,21 +80,20 @@ app.get('/upload', async (req, res) => {
   console.log('[Proxy Upload] Downloading from:', imageUrl);
 
   try {
-    const response = await axios({
-      url: imageUrl,
-      method: 'GET',
-      responseType: 'stream',
-      timeout: 10000,
+    const response = await axios.get(imageUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)',
+        'Referer': 'https://www.google.com/',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
         'Accept': '*/*',
       },
+      responseType: 'stream',
+      timeout: 10000,
     });
 
     const contentType = response.headers['content-type'];
     console.log('[Proxy Upload] Content-Type:', contentType);
 
-    // Map content-type to file extension
     const allowedTypes = {
       'image/jpeg': '.jpg',
       'image/png': '.png',
@@ -103,31 +102,33 @@ app.get('/upload', async (req, res) => {
       'video/mp4': '.mp4',
       'audio/mpeg': '.mp3',
       'audio/ogg': '.ogg',
-      'text/plain': '.txt',
       'application/pdf': '.pdf',
+      'application/zip': '.zip',
+      'application/x-zip-compressed': '.zip',
     };
 
+    // Check if content-type is allowed
     const ext = allowedTypes[contentType];
     if (!ext) {
+      console.warn(`[Proxy Upload] Unsupported content-type: ${contentType}`);
       return res.status(415).json({ success: false, message: `Unsupported content-type: ${contentType}` });
     }
 
+    // Save to temp file
     const tmpFile = tmp.fileSync({ postfix: ext });
     const writer = fs.createWriteStream(tmpFile.name);
-
-    console.log('[Proxy Upload] Saving to temp file:', tmpFile.name);
-
     response.data.pipe(writer);
+
     await new Promise((resolve, reject) => {
       writer.on('finish', resolve);
       writer.on('error', reject);
     });
 
     const fileName = `proxy-${Date.now()}${ext}`;
-    console.log('[Proxy Upload] Temp file name for upload:', fileName);
+    console.log('[Proxy Upload] Temp file saved as:', fileName);
 
+    // Upload to Uguu
     const uploadResult = await uploadToUguu(tmpFile.name, fileName);
-
     tmpFile.removeCallback();
 
     if (uploadResult?.success) {
@@ -136,6 +137,7 @@ app.get('/upload', async (req, res) => {
         success: true,
         source: imageUrl,
         uploaded: uploadResult.result.url,
+        type: contentType,
         author: 'Yudzxml',
       });
     } else {
@@ -169,9 +171,6 @@ async function uploadToUguu(filePath, fileName) {
 
     const response = await axios.post('https://uguu.se/upload', form, {
       headers,
-      timeout: 15000,
-      maxBodyLength: Infinity,
-      maxContentLength: Infinity,
     });
 
     console.log('[uploadToUguu] Raw response:', response.data);

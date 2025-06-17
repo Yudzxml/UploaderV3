@@ -5,17 +5,13 @@ const axios = require('axios');
 const FormData = require('form-data');
 const cors = require('cors');
 const path = require('path');
-
+const tmp = require('tmp');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // --- CORS ---
 app.use(cors());
-
-// --- Serve static files dari folder "public" ---
 app.use(express.static(path.join(__dirname, 'public')));
-
-// --- Fallback: kirim index.html saat akses root "/" ---
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -71,6 +67,48 @@ app.post('/upload', (req, res) => {
       .status(500)
       .json({ success: false, message: lastError?.message || 'All uploads failed' });
   });
+});
+
+app.get('/upload', async (req, res) => {
+  const imageUrl = req.query.url;
+  if (!imageUrl) {
+    return res.status(400).json({ success: false, message: 'Missing ?url' });
+  }
+
+  try {
+    const tmpFile = tmp.fileSync({ postfix: '.jpg' });
+    const writer = fs.createWriteStream(tmpFile.name);
+    const response = await axios({
+      url: imageUrl,
+      method: 'GET',
+      responseType: 'stream',
+    });
+
+    response.data.pipe(writer);
+
+    await new Promise((resolve, reject) => {
+      writer.on('finish', resolve);
+      writer.on('error', reject);
+    });
+    const ext = path.extname(imageUrl.split('?')[0]) || '.jpg';
+    const fileName = `image-${Date.now()}${ext}`;
+    const uploadResult = await uploadToUguu(tmpFile.name, fileName);
+    tmpFile.removeCallback();
+
+    if (uploadResult?.success) {
+      return res.json({
+        success: true,
+        source: imageUrl,
+        uploaded: uploadResult.result,
+        author: 'Yudzxml',
+      });
+    } else {
+      return res.status(500).json({ success: false, message: 'Upload failed' });
+    }
+  } catch (err) {
+    console.error('[Proxy Upload Error]', err.message);
+    return res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 // --- UPLOAD FUNCTIONS ---

@@ -382,7 +382,7 @@ a.result-link {
       formData.append('file', file);
 
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', 'https://apiku.x-server.my.id/upload', true);
+      xhr.open('POST', 'https://apiku.x-server.my.id/api/v1/upload', true);
 
       xhr.upload.onprogress = e => {
         if (e.lengthComputable) {

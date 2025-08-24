@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="description" content="Upload file cepat dan aman menggunakan YUDZ Uploader." />
 <title>YUDZ UPLOADER</title>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
 <style>
   :root {
   --primary: #3b82f6;
@@ -17,60 +15,54 @@
   --dark: #0f172a;
   --light: #f8fafc;
   --gray: #94a3b8;
-  --card-bg: rgba(15, 23, 42, 0.85);
+  --card-bg: rgba(15, 23, 42, 0.75);
 }
 
 * {
-  margin: 0; padding: 0; box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
   background: linear-gradient(135deg, #1e3a8a, #7e22ce, #1e3a8a);
   color: var(--light);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   min-height: 100vh;
-  padding: 20px;
-  display: flex; justify-content: center; align-items: center;
-  width: 100%;
-  overflow-x: hidden;
-  position: relative;
+  padding: 2rem;
 }
 
-/* Canvas partikel full screen di bawah container */
 #particle-canvas {
   position: fixed;
   top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 0;  /* di bawah container */
-  pointer-events: none; /* supaya tidak menghalangi interaksi */
-  background: transparent;
+  width: 100vw; height: 100vh;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .container {
   background: var(--card-bg);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+  backdrop-filter: blur(15px);
+  border-radius: 2rem;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
   width: 100%;
-  max-width: 420px;          /* Dikurangi agar lebih pas di desktop */
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 25px 20px;        /* Padding dikurangi agar tidak terlalu besar */
+  max-width: 480px;
+  padding: 2rem 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  box-sizing: border-box;
+  gap: 1.5rem;
   position: relative;
-  z-index: 1; /* di atas canvas */
+  z-index: 1;
 }
 
 h2 {
-  font-size: 2rem;           /* Ukuran font dikurangi supaya lebih proporsional */
+  font-size: 2rem;
   text-align: center;
   background: linear-gradient(to right, var(--primary), var(--secondary));
   -webkit-background-clip: text;
-  background-clip: text;
   color: transparent;
   text-shadow: 0 0 10px var(--primary);
   animation: glow 2s infinite alternate;
@@ -78,19 +70,16 @@ h2 {
 
 #dropArea {
   border: 3px dashed var(--primary);
-  padding: 30px 15px;
-  border-radius: 15px;
+  padding: 2.2rem 1.2rem;
+  border-radius: 1.5rem;
   text-align: center;
-  background: rgba(15,23,42,0.6);
+  background: rgba(15,23,42,0.55);
   cursor: pointer;
   transition: background 0.3s ease, border-color 0.3s ease;
-  user-select: none;
-  outline-offset: 4px;
-  min-height: 130px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
+  min-height: 6rem;
 }
 
 #dropArea.dragover {
@@ -99,42 +88,33 @@ h2 {
 }
 
 #dropArea p {
-  font-size: 1rem;            /* Lebih pas di mobile */
   color: var(--primary);
-  margin: 0;
+  font-size: 1rem;
 }
 
-#dropArea:focus {
-  outline: 3px solid var(--secondary);
-}
-
-#dropArea input[type="file"] {
-  display: none;
-}
+#dropArea input[type="file"] { display: none; }
 
 button {
   background: linear-gradient(to right, var(--primary), var(--secondary));
   border: none;
-  padding: 12px 16px;
+  padding: 0.85rem 1rem;
   color: white;
   font-weight: 600;
   font-size: 1rem;
-  border-radius: 12px;
+  border-radius: 0.9rem;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(59,130,246,0.4);
-  transition: all 0.3s ease;
+  box-shadow: 0 6px 18px rgba(59,130,246,0.4);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.7rem;
   justify-content: center;
   width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
+  margin-top: 1rem;
 }
 
 button:hover:not(:disabled) {
   background: linear-gradient(to right, var(--primary-dark), #7c3aed);
-  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+  box-shadow: 0 8px 24px rgba(124,58,237,0.6);
 }
 
 button:disabled {
@@ -143,61 +123,64 @@ button:disabled {
   box-shadow: none;
 }
 
-#progressBar {
-  width: 100%;
-  height: 14px;
-  border-radius: 10px;
-  overflow: hidden;
-  background: rgba(15, 23, 42, 0.4);
-  display: none;
-  margin-top: 10px;
-  box-sizing: border-box;
-}
-
-#progressBar::-webkit-progress-value {
-  background: var(--primary);
-  transition: width 0.3s ease;
-}
-
-#progressBar::-moz-progress-bar {
-  background: var(--primary);
-  transition: width 0.3s ease;
-}
-
 #loader {
   display: none;
-  border: 6px solid rgba(30, 41, 59, 0.8);
+  border: 6px solid rgba(30,41,59,0.8);
   border-top: 6px solid var(--primary);
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 3rem;
+  height: 3rem;
   animation: spin 1s linear infinite;
-  margin: 20px auto 0 auto;
+  margin: 1.5rem auto 0 auto;
 }
 
 #result, #error {
   text-align: center;
   word-break: break-word;
   font-size: 1rem;
-  max-width: 100%;
-  padding: 0 10px;
+  padding: 0 0.5rem;
 }
 
-#result {
-  color: var(--success);
+#result { color: var(--success); }
+#error { color: #ff6b6b; }
+
+.result-card {
+  background: rgba(15,23,42,0.7);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 1.2rem;
+  padding: 1.2rem 1.5rem;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  animation: fadeIn 0.5s ease;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-#error {
-  color: #ff6b6b;
+.result-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 35px rgba(0,0,0,0.5);
 }
+
+.result-card a.result-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.result-card a.result-link i { font-size: 1.2rem; }
 
 #toast {
   position: fixed;
-  bottom: 30px;
+  bottom: 2rem;
   background: var(--card-bg);
   color: var(--success);
-  padding: 12px 20px;
-  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
   box-shadow: 0 0 15px var(--success);
   display: none;
   animation: fadeIn 0.5s ease-in-out;
@@ -209,294 +192,94 @@ button:disabled {
   word-wrap: break-word;
 }
 
-a.result-link {
-  color: var(--primary);
-  text-decoration: underline;
-  font-weight: 600;
-  word-break: break-word;
-}
+@keyframes glow { from {text-shadow:0 0 10px var(--primary);} to {text-shadow:0 0 20px var(--secondary),0 0 30px var(--primary);} }
+@keyframes spin { to {transform:rotate(360deg);} }
+@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
 
-/* Animations */
-@keyframes glow {
-  from { text-shadow: 0 0 10px var(--primary); }
-  to { text-shadow: 0 0 20px var(--secondary), 0 0 30px var(--primary); }
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; bottom: 0; }
-  to { opacity: 1; bottom: 30px; }
-}
-
-/* RESPONSIVE */
-@media (max-width: 480px) {
-  body {
-    padding: 15px 10px;
-  }
-  .container {
-    max-width: 100%;
-    padding: 20px 15px;
-    border-radius: 15px;
-    gap: 15px;
-  }
-  h2 {
-    font-size: 1.6rem;
-  }
-  #dropArea {
-    padding: 25px 15px;
-    min-height: 110px;
-  }
-  #dropArea p {
-    font-size: 0.95rem;
-  }
-  button {
-    font-size: 0.95rem;
-    padding: 10px 14px;
-  }
-  #result, #error {
-    font-size: 0.95rem;
-    padding: 0 8px;
-  }
-  #loader {
-    width: 35px;
-    height: 35px;
-    border-width: 5px;
-    margin: 15px auto 0 auto;
-  }
-  #progressBar {
-    height: 12px;
-  }
-  #toast {
-    bottom: 20px;
-    max-width: 95vw;
-    font-size: 0.9rem;
-  }
+@media (max-width: 480px){
+  .container { padding: 1.2rem 1rem; gap: 1rem; border-radius: 1rem; }
+  h2 { font-size: 1.6rem; }
+  #dropArea { padding: 1.5rem 1rem; min-height:5rem; }
+  button { font-size:0.95rem; padding:0.6rem 0.9rem; }
+  #loader { width:2.5rem; height:2.5rem; border-width:5px; margin:1rem auto 0 auto; }
+  #result, #error { font-size:0.95rem; padding:0 0.3rem; }
+  #toast { bottom:1.5rem; font-size:0.85rem; max-width:95vw; }
 }
 </style>
 </head>
 <body>
-
-  <!-- Canvas animasi partikel -->
-  <canvas id="particle-canvas" aria-hidden="true"></canvas>
-
-  <div class="container" role="main">
-    <h2><i class="fas fa-cloud-upload-alt" aria-hidden="true"></i> YUDZ UPLOADER</h2>
-    <form id="uploadForm" aria-describedby="descUpload">
-      <label id="dropArea" for="fileInput" tabindex="0" role="button" aria-label="Drag dan drop file ke sini atau klik untuk memilih file">
-        <p id="descUpload">Drag & Drop file ke sini atau klik untuk memilih file</p>
-        <input type="file" id="fileInput" name="file" accept="*/*" required aria-required="true" />
-      </label>
-      <progress id="progressBar" value="0" max="100" aria-valuemin="0" aria-valuemax="100" aria-hidden="true"></progress>
-      <button type="submit" id="uploadBtn" disabled aria-disabled="true"><i class="fas fa-upload" aria-hidden="true"></i> Upload</button>
-      <div id="loader" role="status" aria-live="polite" aria-label="Loading"></div>
-    </form>
-    <div id="result" role="alert" aria-live="polite"></div>
-    <div id="error" role="alert" aria-live="assertive"></div>
-  </div>
-  <div id="toast" role="alert" aria-live="polite" aria-atomic="true"></div>
+<canvas id="particle-canvas" aria-hidden="true"></canvas>
+<div class="container" role="main">
+  <h2><i class="fas fa-cloud-upload-alt" aria-hidden="true"></i> CDN-YUDZ</h2>
+  <form id="uploadForm" aria-describedby="descUpload">
+    <label id="dropArea" for="fileInput" tabindex="0" role="button" aria-label="Drag dan drop file ke sini atau klik untuk memilih file">
+      <p id="descUpload">Drag & Drop file ke sini atau klik untuk memilih file</p>
+      <input type="file" id="fileInput" name="file" accept="*/*" required aria-required="true" />
+    </label>
+    <button type="submit" id="uploadBtn" disabled aria-disabled="true"><i class="fas fa-upload"></i> Upload</button>
+    <div id="loader" role="status" aria-live="polite" aria-label="Loading"></div>
+  </form>
+  <div id="result" role="alert" aria-live="polite"></div>
+  <div id="error" role="alert" aria-live="assertive"></div>
+</div>
+<div id="toast" role="alert" aria-live="polite" aria-atomic="true"></div>
 
 <script>
-  (function(){
-    const form = document.getElementById('uploadForm');
-    const dropArea = document.getElementById('dropArea');
-    const fileInput = document.getElementById('fileInput');
-    const resultDiv = document.getElementById('result');
-    const errorDiv = document.getElementById('error');
-    const loader = document.getElementById('loader');
-    const toast = document.getElementById('toast');
-    const progressBar = document.getElementById('progressBar');
-    const uploadBtn = document.getElementById('uploadBtn');
+(function(){
+  const form=document.getElementById('uploadForm');
+  const dropArea=document.getElementById('dropArea');
+  const fileInput=document.getElementById('fileInput');
+  const resultDiv=document.getElementById('result');
+  const errorDiv=document.getElementById('error');
+  const loader=document.getElementById('loader');
+  const toast=document.getElementById('toast');
+  const uploadBtn=document.getElementById('uploadBtn');
 
-    // Fungsi tampilkan toast
-    function showToast(message) {
-      toast.textContent = message;
-      toast.style.display = 'block';
-      setTimeout(() => {
-        toast.style.display = 'none';
-      }, 3000);
-    }
+  function showToast(msg){toast.textContent=msg; toast.style.display='block'; setTimeout(()=>{toast.style.display='none';},3000);}
+  fileInput.addEventListener('change',()=>{uploadBtn.disabled=!fileInput.files.length; uploadBtn.setAttribute('aria-disabled',String(uploadBtn.disabled)); resultDiv.textContent=''; errorDiv.textContent='';});
+  ['dragenter','dragover'].forEach(e=>dropArea.addEventListener(e,a=>{a.preventDefault(); dropArea.classList.add('dragover');}));
+  ['dragleave','drop'].forEach(e=>dropArea.addEventListener(e,a=>{a.preventDefault(); dropArea.classList.remove('dragover');}));
+  dropArea.addEventListener('drop',e=>{e.preventDefault(); if(e.dataTransfer.files.length){fileInput.files=e.dataTransfer.files; uploadBtn.disabled=false; uploadBtn.setAttribute('aria-disabled','false'); resultDiv.textContent=''; errorDiv.textContent='';}});
+  dropArea.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault(); fileInput.click();}});
+  
+  form.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const file=fileInput.files[0]; 
+    if(!file){ errorDiv.textContent='Silakan pilih file terlebih dahulu.'; return;}
+    if(file.size>100*1024*1024){ errorDiv.textContent='File terlalu besar. Maksimal 100MB.'; return;}
+    loader.style.display='block'; uploadBtn.disabled=true; resultDiv.textContent=''; errorDiv.textContent='';
 
-    fileInput.addEventListener('change', () => {
-      uploadBtn.disabled = !fileInput.files.length;
-      uploadBtn.setAttribute('aria-disabled', String(uploadBtn.disabled));
-      resultDiv.textContent = '';
-      errorDiv.textContent = '';
-    });
+    const formData=new FormData(); formData.append('file',file);
+    try{
+      const res=await fetch('https://apiku.x-server.my.id/api/v1/upload',{method:'POST',body:formData});
+      const data=await res.json();
+      loader.style.display='none'; uploadBtn.disabled=false;
+      if(res.ok && data?.result?.url){
+        const url=data.result.url;
+        resultDiv.innerHTML=`<div class="result-card"><p><strong>File berhasil diupload!</strong></p>
+        <a href="${url}" class="result-link" target="_blank"><i class="fas fa-file-upload"></i> ${file.name}</a>
+        <button id="copyBtn"><i class="fas fa-copy"></i> Salin Link</button></div>`;
+        document.getElementById('copyBtn').addEventListener('click',()=>{navigator.clipboard.writeText(url).then(()=>showToast('URL berhasil disalin!')).catch(()=>showToast('Gagal menyalin URL.'));});
+      }else errorDiv.textContent=data.message||'Upload gagal.';
+    }catch(err){loader.style.display='none'; uploadBtn.disabled=false; errorDiv.textContent='Terjadi kesalahan saat mengunggah file.'; console.error(err);}
+  });
+})();
 
-    ['dragenter', 'dragover'].forEach(evt => {
-      dropArea.addEventListener(evt, e => {
-        e.preventDefault();
-        dropArea.classList.add('dragover');
-      });
-    });
-    ['dragleave', 'drop'].forEach(evt => {
-      dropArea.addEventListener(evt, e => {
-        e.preventDefault();
-        dropArea.classList.remove('dragover');
-      });
-    });
-    dropArea.addEventListener('drop', e => {
-      e.preventDefault();
-      if (e.dataTransfer.files.length) {
-        fileInput.files = e.dataTransfer.files;
-        uploadBtn.disabled = false;
-        uploadBtn.setAttribute('aria-disabled', 'false');
-        resultDiv.textContent = '';
-        errorDiv.textContent = '';
-      }
-    });
-
-
-    dropArea.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        fileInput.click();
-      }
-    });
-
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      const file = fileInput.files[0];
-      if (!file) {
-        errorDiv.textContent = 'Silakan pilih file terlebih dahulu.';
-        return;
-      }
-      if (file.size > 100 * 1024 * 1024) {
-        errorDiv.textContent = 'File terlalu besar. Maksimal 100MB.';
-        return;
-      }
-
-      resultDiv.textContent = '';
-      errorDiv.textContent = '';
-      loader.style.display = 'block';
-      progressBar.style.display = 'block';
-      progressBar.value = 0;
-      progressBar.setAttribute('aria-hidden', 'false');
-      uploadBtn.disabled = true;
-      uploadBtn.setAttribute('aria-disabled', 'true');
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', 'https://apiku.x-server.my.id/api/v1/upload', true);
-
-      xhr.upload.onprogress = e => {
-        if (e.lengthComputable) {
-          const percent = (e.loaded / e.total) * 100;
-          progressBar.value = percent;
-        }
-      };
-
-      xhr.onload = () => {
-        loader.style.display = 'none';
-        progressBar.style.display = 'none';
-        progressBar.setAttribute('aria-hidden', 'true');
-        uploadBtn.disabled = false;
-        uploadBtn.setAttribute('aria-disabled', 'false');
-        try {
-          const data = JSON.parse(xhr.responseText);
-          if (xhr.status === 200 && data?.result?.url) {
-            const url = data.result.url;
-            resultDiv.innerHTML = `
-              <p><strong>File berhasil diupload!</strong></p>
-              <p><a href="${url}" class="result-link" target="_blank" rel="noopener noreferrer">${url}</a></p>
-              <button id="copyBtn" aria-label="Salin link hasil upload"><i class="fas fa-copy" aria-hidden="true"></i> Salin Link</button>
-            `;
-            const copyBtn = document.getElementById('copyBtn');
-            copyBtn.addEventListener('click', () => {
-              navigator.clipboard.writeText(url).then(() => {
-                showToast('URL berhasil disalin!');
-              }).catch(() => {
-                showToast('Gagal menyalin URL.');
-              });
-            });
-          } else {
-            errorDiv.textContent = data.message || 'Upload gagal.';
-          }
-        } catch (err) {
-          errorDiv.textContent = 'Terjadi kesalahan saat memproses respons.';
-          console.error(err);
-        }
-      };
-
-      xhr.onerror = () => {
-        loader.style.display = 'none';
-        progressBar.style.display = 'none';
-        progressBar.setAttribute('aria-hidden', 'true');
-        uploadBtn.disabled = false;
-        uploadBtn.setAttribute('aria-disabled', 'false');
-        errorDiv.textContent = 'Gagal mengunggah file.';
-      };
-
-      xhr.send(formData);
-    });
-
-  })();
-
-  (() => {
-    const canvas = document.getElementById('particle-canvas');
-    const ctx = canvas.getContext('2d');
-
-    function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    class Particle {
-      constructor() {
-        this.reset();
-      }
-      reset() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 1;
-        this.speedX = (Math.random() - 0.5) * 0.5;
-        this.speedY = (Math.random() - 0.5) * 0.5;
-        this.opacity = Math.random() * 0.5 + 0.3;
-      }
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-
-        if(this.x < 0) this.x = canvas.width;
-        else if(this.x > canvas.width) this.x = 0;
-
-        if(this.y < 0) this.y = canvas.height;
-        else if(this.y > canvas.height) this.y = 0;
-      }
-      draw() {
-        ctx.beginPath();
-        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
-        ctx.shadowColor = 'rgba(255,255,255,0.7)';
-        ctx.shadowBlur = 4;
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    const particles = [];
-    const PARTICLE_COUNT = 100;
-    for(let i=0; i<PARTICLE_COUNT; i++) {
-      particles.push(new Particle());
-    }
-
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for(const p of particles) {
-        p.update();
-        p.draw();
-      }
-      requestAnimationFrame(animate);
-    }
-    animate();
-
-  })();
+(() => {
+  const canvas=document.getElementById('particle-canvas');
+  const ctx=canvas.getContext('2d');
+  function resize(){canvas.width=window.innerWidth; canvas.height=window.innerHeight;}
+  resize(); window.addEventListener('resize',resize);
+  class Particle{
+    constructor(){this.reset();}
+    reset(){this.x=Math.random()*canvas.width; this.y=Math.random()*canvas.height; this.size=Math.random()*2+1; this.speedX=(Math.random()-0.5)*0.5; this.speedY=(Math.random()-0.5)*0.5; this.opacity=Math.random()*0.5+0.3;}
+    update(){this.x+=this.speedX; this.y+=this.speedY; if(this.x<0)this.x=canvas.width; else if(this.x>canvas.width)this.x=0; if(this.y<0)this.y=canvas.height; else if(this.y>canvas.height)this.y=0;}
+    draw(){ctx.beginPath(); ctx.fillStyle=`rgba(255,255,255,${this.opacity})`; ctx.shadowColor='rgba(255,255,255,0.7)'; ctx.shadowBlur=4; ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill();}
+  }
+  const particles=[]; for(let i=0;i<100;i++){particles.push(new Particle());}
+  function animate(){ctx.clearRect(0,0,canvas.width,canvas.height); for(const p of particles){p.update(); p.draw();} requestAnimationFrame(animate);}
+  animate();
+})();
 </script>
 </body>
 </html>

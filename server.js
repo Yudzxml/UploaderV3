@@ -80,7 +80,7 @@ async function ypnk(filePath) {
 
   const headers = { ...form.getHeaders(), 'User-Agent': 'Mozilla/5.0' };
 
-  const res = await axios.post('https://cdn.ypnk.biz.id/upload', form, { headers });
+  const res = await axios.post('https://cdn.yupra.my.id/upload', form, { headers });
   const fileUrl = res.data.files?.[0]?.url ? 'https://cdn.ypnk.biz.id' + res.data.files[0].url : null;
 
   return { success: true, author: 'Yudzxml', result: { url: fileUrl, message: 'File uploaded successfully' } };

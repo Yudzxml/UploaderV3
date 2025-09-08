@@ -32,8 +32,8 @@ app.post('/api/v2/upload', (req, res) => {
 function handleUpload(req, res, uploadFunctions) {
   const form = new formidable.IncomingForm({
     keepExtensions: true,
-    maxFileSize: 100 * 1024 * 1024, // 100MB
-    uploadDir: '/tmp', // railway friendly
+    maxFileSize: 100 * 1024 * 1024,
+    uploadDir: '/tmp', 
   });
 
   form.parse(req, async (err, fields, files) => {
@@ -56,7 +56,7 @@ function handleUpload(req, res, uploadFunctions) {
         const result = await fn(filePath, fileName);
         if (result && result.success) {
           console.log(`[SUCCESS] via ${fn.name}`);
-          fs.unlink(filePath, () => {}); // cleanup
+          fs.unlink(filePath, () => {});
           return res.json(result);
         } else {
           lastError = new Error(`Upload failed or invalid response from ${fn.name}`);
@@ -81,7 +81,7 @@ async function ypnk(filePath) {
   const headers = { ...form.getHeaders(), 'User-Agent': 'Mozilla/5.0' };
 
   const res = await axios.post('https://cdn.yupra.my.id/upload', form, { headers });
-  const fileUrl = res.data.files?.[0]?.url ? 'https://cdn.ypnk.biz.id' + res.data.files[0].url : null;
+  const fileUrl = res.data.files?.[0]?.url ? 'https://cdn.yupra.my.id' + res.data.files[0].url : null;
 
   return { success: true, author: 'Yudzxml', result: { url: fileUrl, message: 'File uploaded successfully' } };
 }

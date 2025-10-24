@@ -7,17 +7,22 @@
 <title>YUDZ UPLOADER</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <style>
   :root {
-    --bg-color: #0f0f23;
-    --surface-color: #1a1a2e;
-    --primary-color: #00d9ff;
-    --text-color: #e0e0e0;
-    --error-color: #ff4757;
-    --success-color: #2ed573;
-    --border-color: #2a2a4a;
+    --bg-color: #0d1117;
+    --surface-color: #161b22;
+    --surface-secondary: #21262d;
+    --primary-color: #388bfd;
+    --primary-hover: #58a6ff;
+    --text-color: #c9d1d9;
+    --text-secondary: #8b949e;
+    --error-color: #f85149;
+    --success-color: #3fb950;
+    --warning-color: #d29922;
+    --border-color: #30363d;
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   }
 
   * {
@@ -27,7 +32,7 @@
   }
 
   body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     display: flex;
@@ -36,6 +41,7 @@
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
+    line-height: 1.6;
   }
 
   #particle-canvas {
@@ -45,33 +51,96 @@
     width: 100%;
     height: 100%;
     z-index: -1;
-    opacity: 0.5;
+    opacity: 0.2;
+  }
+
+  .app-container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+  }
+
+  .main-content {
+    flex: 1;
+    max-width: 600px;
+  }
+
+  .sidebar {
+    width: 300px;
+    display: none;
   }
 
   .container {
     background-color: var(--surface-color);
-    padding: 2rem 3rem;
-    border-radius: 16px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
     width: 100%;
-    max-width: 500px;
     border: 1px solid var(--border-color);
-    backdrop-filter: blur(10px);
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .logo i {
+    font-size: 1.8rem;
+    color: var(--primary-color);
   }
 
   h2 {
-    text-align: center;
-    margin-bottom: 0.5rem;
     font-weight: 600;
-    color: var(--primary-color);
-    font-size: 2rem;
+    color: var(--text-color);
+    font-size: 1.5rem;
   }
 
   .subtitle {
-    text-align: center;
-    margin-bottom: 2rem;
+    color: var(--text-secondary);
     font-size: 0.9rem;
-    color: #a0a0a0;
+    margin-bottom: 1.5rem;
+  }
+
+  .tabs {
+    display: flex;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .tab {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .tab.active {
+    color: var(--text-color);
+    border-bottom-color: var(--primary-color);
+  }
+
+  .tab:hover {
+    color: var(--text-color);
+  }
+
+  .tab-content {
+    display: none;
+  }
+
+  .tab-content.active {
+    display: block;
   }
 
   form {
@@ -89,42 +158,101 @@
   label {
     font-weight: 500;
     font-size: 0.9rem;
+    color: var(--text-color);
   }
 
   input[type="text"] {
     width: 100%;
-    padding: 0.8rem 1rem;
-    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
     border: 1px solid var(--border-color);
-    background-color: #252541;
+    background-color: var(--surface-secondary);
     color: var(--text-color);
-    font-size: 1rem;
-    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
   }
 
   input[type="text"]:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.2);
+    box-shadow: 0 0 0 3px rgba(56, 139, 253, 0.1);
+  }
+
+  .api-info {
+    background-color: rgba(56, 139, 253, 0.1);
+    border: 1px solid rgba(56, 139, 253, 0.2);
+    border-radius: 6px;
+    padding: 0.75rem;
+    font-size: 0.85rem;
+    margin-top: -0.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .api-info i {
+    color: var(--primary-color);
+    margin-top: 0.1rem;
+  }
+
+  .api-info a {
+    color: var(--primary-color);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .api-info a:hover {
+    text-decoration: underline;
+  }
+
+  .version-selector {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .version-selector input[type="radio"] {
+    display: none;
+  }
+
+  .version-selector label {
+    flex: 1;
+    padding: 0.75rem;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: var(--surface-secondary);
+    font-weight: 500;
+  }
+
+  .version-selector label:hover {
+    border-color: var(--primary-color);
+  }
+
+  .version-selector input[type="radio"]:checked + label {
+    border-color: var(--primary-color);
+    background-color: rgba(56, 139, 253, 0.1);
+    color: var(--primary-color);
   }
 
   #dropArea {
     border: 2px dashed var(--border-color);
-    border-radius: 12px;
+    border-radius: 8px;
     padding: 2rem;
     text-align: center;
     cursor: pointer;
-    transition: all 0.3s ease;
-    background-color: #252541;
+    transition: all 0.2s ease;
+    background-color: var(--surface-secondary);
   }
 
   #dropArea:hover, #dropArea.dragover {
     border-color: var(--primary-color);
-    background-color: rgba(0, 217, 255, 0.05);
+    background-color: rgba(56, 139, 253, 0.05);
   }
 
   #dropArea i {
-    font-size: 3rem;
+    font-size: 2.5rem;
     color: var(--primary-color);
     margin-bottom: 1rem;
   }
@@ -133,16 +261,46 @@
     display: none;
   }
 
-  button {
-    padding: 0.9rem 1.5rem;
+  .file-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--surface-secondary);
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+  }
+
+  .file-name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .file-size {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+  }
+
+  .remove-file {
+    background: none;
     border: none;
-    border-radius: 8px;
-    background-color: var(--primary-color);
-    color: var(--bg-color);
-    font-size: 1.1rem;
-    font-weight: 600;
+    color: var(--error-color);
     cursor: pointer;
-    transition: all 0.3s ease;
+    padding: 0.25rem;
+  }
+
+  button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -150,56 +308,58 @@
   }
 
   button:hover:not(:disabled) {
-    background-color: #00b8e6;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 217, 255, 0.4);
+    background-color: var(--primary-hover);
   }
 
   button:disabled {
-    background-color: #555;
+    background-color: var(--border-color);
     cursor: not-allowed;
     opacity: 0.6;
   }
 
   #progressContainer {
     width: 100%;
-    height: 8px;
-    background-color: #252541;
-    border-radius: 4px;
+    height: 6px;
+    background-color: var(--surface-secondary);
+    border-radius: 3px;
     overflow: hidden;
-    display: none; /* Hidden by default */
+    display: none;
   }
 
   #progressBar {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, var(--primary-color), #00f2fe);
-    border-radius: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+    border-radius: 3px;
     transition: width 0.2s ease;
   }
 
   #result, #error {
     margin-top: 1.5rem;
     padding: 1rem;
-    border-radius: 8px;
+    border-radius: 6px;
     display: none;
     word-wrap: break-word;
   }
 
   #result {
     border: 1px solid var(--success-color);
-    background-color: rgba(46, 213, 115, 0.1);
+    background-color: rgba(63, 185, 80, 0.1);
   }
 
   #result h3 {
     color: var(--success-color);
     margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   #result a {
     color: var(--primary-color);
     text-decoration: none;
     font-weight: 500;
+    word-break: break-all;
   }
 
   #result a:hover {
@@ -211,10 +371,14 @@
     background-color: var(--success-color);
     color: white;
   }
+  
+  #result p {
+      margin-bottom: 0.5rem;
+  }
 
   #error {
     border: 1px solid var(--error-color);
-    background-color: rgba(255, 71, 87, 0.1);
+    background-color: rgba(248, 81, 73, 0.1);
     color: var(--error-color);
   }
 
@@ -223,13 +387,14 @@
     top: 20px;
     right: 20px;
     padding: 1rem 1.5rem;
-    border-radius: 8px;
+    border-radius: 6px;
     color: white;
     font-weight: 500;
     opacity: 0;
     transform: translateX(100%);
-    transition: all 0.4s ease;
+    transition: all 0.3s ease;
     z-index: 1000;
+    box-shadow: var(--shadow);
   }
 
   #toast.show {
@@ -240,54 +405,273 @@
   #toast.success { background-color: var(--success-color); }
   #toast.error { background-color: var(--error-color); }
 
+  .stats-container {
+    background-color: var(--surface-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+  }
+
+  .stats-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .stat-item {
+    background-color: var(--surface-secondary);
+    padding: 1rem;
+    border-radius: 6px;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  .history-container {
+    background-color: var(--surface-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+  }
+
+  .history-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .history-item {
+    background-color: var(--surface-secondary);
+    padding: 0.75rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .history-file {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .history-date {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+
+  .loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .clear-history-btn {
+    background-color: var(--surface-secondary);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    margin-top: 0.5rem;
+  }
+
+  .clear-history-btn:hover {
+    background-color: var(--error-color);
+    color: white;
+  }
+
+  @media (max-width: 992px) {
+    .app-container {
+      flex-direction: column;
+    }
+    
+    .sidebar {
+      width: 100%;
+      display: block;
+    }
+  }
+
   @media (max-width: 600px) {
     .container {
       padding: 1.5rem;
-      margin: 1rem;
     }
+    
     h2 {
-      font-size: 1.8rem;
+      font-size: 1.3rem;
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>
 </head>
 <body>
 <canvas id="particle-canvas" aria-hidden="true"></canvas>
-<div class="container" role="main">
-  <h2><i class="fas fa-cloud-upload-alt" aria-hidden="true"></i> CDN-YUDZ</h2>
-  <p class="subtitle">Upload file Anda dengan cepat dan aman</p>
-  
-  <form id="uploadForm" aria-describedby="descUpload">
-    <div class="input-group">
-      <label for="apiKeyInput">API Key</label>
-      <input type="text" id="apiKeyInput" name="apikey" placeholder="Masukkan API Key Anda" required aria-required="true">
-    </div>
+<div class="app-container">
+  <div class="main-content">
+    <div class="container" role="main">
+      <div class="header">
+        <div class="logo">
+          <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i>
+          <h2>CDN-YUDZ</h2>
+        </div>
+        <div class="header-actions">
+          <button type="button" id="themeToggle" aria-label="Toggle theme">
+            <i class="fas fa-moon"></i>
+          </button>
+        </div>
+      </div>
+      <p class="subtitle">Upload file Anda dengan cepat dan aman</p>
+      
+      <div class="tabs">
+        <div class="tab active" data-tab="upload">Upload</div>
+        <div class="tab" data-tab="history">Riwayat</div>
+      </div>
+      
+      <div class="tab-content active" id="upload-tab">
+        <form id="uploadForm" aria-describedby="descUpload">
+          <div class="input-group">
+            <label for="apiKeyInput">API Key</label>
+            <input type="text" id="apiKeyInput" name="apikey" placeholder="Masukkan API Key Anda" required aria-required="true">
+            <div class="api-info">
+              <i class="fas fa-info-circle"></i>
+              <span>Dapatkan API Key dengan login ke <a href="https://yydz.biz.id" target="_blank">yydz.biz.id</a> lalu pilih "Get Started"</span>
+            </div>
+          </div>
 
-    <div class="input-group">
-      <label id="dropArea" for="fileInput" tabindex="0" role="button" aria-label="Drag dan drop file ke sini atau klik untuk memilih file">
-        <i class="fas fa-cloud-arrow-up"></i>
-        <p id="descUpload">Drag & Drop file ke sini atau klik untuk memilih</p>
-        <input type="file" id="fileInput" name="file" accept="*/*" required aria-required="true" />
-      </label>
-    </div>
+          <div class="input-group">
+            <label>Pilih Versi Upload</label>
+            <div class="version-selector">
+              <input type="radio" id="v1" name="version" value="v1" checked>
+              <label for="v1">v1 (Permanen)</label>
+              <input type="radio" id="v2" name="version" value="v2">
+              <label for="v2">v2 (Kadaluarsa)</label>
+            </div>
+          </div>
 
-    <button type="submit" id="uploadBtn" disabled aria-disabled="true">
-      <i class="fas fa-upload"></i> <span>Upload File</span>
-    </button>
-    
-    <div id="progressContainer" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Upload progress">
-      <div id="progressBar"></div>
-    </div>
-  </form>
+          <div class="input-group">
+            <label id="dropArea" for="fileInput" tabindex="0" role="button" aria-label="Drag dan drop file ke sini atau klik untuk memilih file">
+              <i class="fas fa-cloud-arrow-up"></i>
+              <p id="descUpload">Drag & Drop file ke sini atau klik untuk memilih</p>
+              <input type="file" id="fileInput" name="file" accept="*/*" required aria-required="true" />
+            </label>
+            <div id="fileInfo" class="file-info" style="display: none;">
+              <div class="file-name">
+                <i class="fas fa-file"></i>
+                <span id="fileName"></span>
+              </div>
+              <div class="file-size" id="fileSize"></div>
+              <button type="button" id="removeFile" class="remove-file" aria-label="Remove file">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
 
-  <div id="result" role="alert" aria-live="polite">
-    <h3><i class="fas fa-check-circle"></i> Upload Berhasil!</h3>
-    <p>Link File:</p>
-    <a id="resultLink" href="#" target="_blank"></a>
-    <button id="copyBtn"><i class="fas fa-copy"></i> Salin Link</button>
+          <button type="submit" id="uploadBtn" disabled aria-disabled="true">
+            <i class="fas fa-upload"></i> <span>Upload File</span>
+          </button>
+          
+          <div id="progressContainer" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Upload progress">
+            <div id="progressBar"></div>
+          </div>
+        </form>
+
+        <div id="result" role="alert" aria-live="polite">
+          <h3><i class="fas fa-check-circle"></i> Upload Berhasil!</h3>
+          <p>Link File:</p>
+          <a id="resultLink" href="#" target="_blank"></a>
+          <p id="expiryInfo"></p>
+          <button id="copyBtn"><i class="fas fa-copy"></i> Salin Link</button>
+        </div>
+        
+        <div id="error" role="alert" aria-live="assertive"></div>
+      </div>
+      
+      <div class="tab-content" id="history-tab">
+        <div class="history-list">
+          <p style="text-align: center; color: var(--text-secondary); padding: 2rem 0;">Belum ada riwayat upload</p>
+        </div>
+        <button id="clearHistoryBtn" class="clear-history-btn">
+          <i class="fas fa-trash"></i> Hapus Riwayat
+        </button>
+      </div>
+    </div>
   </div>
   
-  <div id="error" role="alert" aria-live="assertive"></div>
+  <div class="sidebar">
+    <div class="stats-container">
+      <div class="stats-title">
+        <i class="fas fa-chart-bar"></i>
+        Statistik Upload
+      </div>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value" id="totalUploads">0</div>
+          <div class="stat-label">Total Upload</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="totalSize">0 MB</div>
+          <div class="stat-label">Total Ukuran</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="todayUploads">0</div>
+          <div class="stat-label">Upload Hari Ini</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="storageUsed">0%</div>
+          <div class="stat-label">Penyimpanan</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="history-container">
+      <div class="history-title">
+        <i class="fas fa-history"></i>
+        Upload Terbaru
+      </div>
+      <div class="history-list">
+        <p style="text-align: center; color: var(--text-secondary); padding: 1rem 0;">Belum ada riwayat upload</p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="toast" role="alert" aria-live="polite" aria-atomic="true"></div>
@@ -304,10 +688,34 @@ document.addEventListener('DOMContentLoaded', () => {
   const progressBar = document.getElementById('progressBar');
   const resultDiv = document.getElementById('result');
   const resultLink = document.getElementById('resultLink');
+  const expiryInfo = document.getElementById('expiryInfo');
   const copyBtn = document.getElementById('copyBtn');
   const errorDiv = document.getElementById('error');
   const toast = document.getElementById('toast');
-
+  const fileInfo = document.getElementById('fileInfo');
+  const fileName = document.getElementById('fileName');
+  const fileSize = document.getElementById('fileSize');
+  const removeFileBtn = document.getElementById('removeFile');
+  const tabs = document.querySelectorAll('.tab');
+  const tabContents = document.querySelectorAll('.tab-content');
+  const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+  
+  // --- LOCALSTORAGE INITIALIZATION ---
+  // Initialize localStorage if not exists
+  if (!localStorage.getItem('uploadStats')) {
+    localStorage.setItem('uploadStats', JSON.stringify({
+      totalUploads: 0,
+      totalSize: 0,
+      todayUploads: 0,
+      lastUploadDate: new Date().toDateString(),
+      storageUsed: 0
+    }));
+  }
+  
+  if (!localStorage.getItem('uploadHistory')) {
+    localStorage.setItem('uploadHistory', JSON.stringify([]));
+  }
+  
   // --- PARTICLE CANVAS ---
   const canvas = document.getElementById('particle-canvas');
   const ctx = canvas.getContext('2d');
@@ -319,9 +727,10 @@ document.addEventListener('DOMContentLoaded', () => {
     constructor() {
       this.x = Math.random() * canvas.width;
       this.y = Math.random() * canvas.height;
-      this.size = Math.random() * 3 + 1;
-      this.speedX = Math.random() * 0.5 - 0.25;
-      this.speedY = Math.random() * 0.5 - 0.25;
+      this.size = Math.random() * 2 + 0.5;
+      this.speedX = Math.random() * 0.3 - 0.15;
+      this.speedY = Math.random() * 0.3 - 0.15;
+      this.opacity = Math.random() * 0.5 + 0.2;
     }
     update() {
       this.x += this.speedX;
@@ -332,7 +741,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (this.y < 0) this.y = canvas.height;
     }
     draw() {
-      ctx.fillStyle = 'rgba(0, 217, 255, 0.8)';
+      ctx.fillStyle = `rgba(56, 139, 253, ${this.opacity})`;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
       ctx.fill();
@@ -341,10 +750,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function initParticles() {
     particlesArray = [];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 50; i++) {
       particlesArray.push(new Particle());
     }
   }
+  
   function animateParticles() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     particlesArray.forEach(particle => {
@@ -353,6 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     requestAnimationFrame(animateParticles);
   }
+  
   initParticles();
   animateParticles();
 
@@ -365,7 +776,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- HELPER FUNCTIONS ---
   const showToast = (message, type) => {
     toast.textContent = message;
-    toast.className = type; // 'success' or 'error'
+    toast.className = type;
     setTimeout(() => toast.classList.add('show'), 10);
     setTimeout(() => toast.classList.remove('show'), 3000);
   };
@@ -379,6 +790,161 @@ document.addEventListener('DOMContentLoaded', () => {
       uploadBtn.setAttribute('aria-disabled', 'true');
     }
   };
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  // --- LOCALSTORAGE FUNCTIONS ---
+  const getStats = () => {
+    return JSON.parse(localStorage.getItem('uploadStats'));
+  };
+  
+  const updateStats = (fileSize) => {
+    const stats = getStats();
+    const today = new Date().toDateString();
+    
+    // Reset today's count if it's a new day
+    if (stats.lastUploadDate !== today) {
+      stats.todayUploads = 0;
+      stats.lastUploadDate = today;
+    }
+    
+    stats.totalUploads += 1;
+    stats.totalSize += fileSize;
+    stats.todayUploads += 1;
+    
+    // Calculate storage used (assuming 5GB limit)
+    const maxStorage = 5 * 1024 * 1024 * 1024; // 5GB in bytes
+    stats.storageUsed = Math.round((stats.totalSize / maxStorage) * 100);
+    
+    localStorage.setItem('uploadStats', JSON.stringify(stats));
+    renderStats();
+  };
+  
+  const renderStats = () => {
+    const stats = getStats();
+    
+    // Animate the stats
+    animateValue('totalUploads', parseInt(document.getElementById('totalUploads').textContent), stats.totalUploads, 500);
+    animateValue('todayUploads', parseInt(document.getElementById('todayUploads').textContent), stats.todayUploads, 500);
+    animateValue('storageUsed', parseInt(document.getElementById('storageUsed').textContent), stats.storageUsed, 500);
+    
+    // Update total size with proper formatting
+    document.getElementById('totalSize').textContent = formatFileSize(stats.totalSize);
+  };
+  
+  const animateValue = (id, start, end, duration) => {
+    const element = document.getElementById(id);
+    const range = end - start;
+    const increment = range / (duration / 16);
+    let current = start;
+    
+    const timer = setInterval(() => {
+      current += increment;
+      if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+        element.textContent = end;
+        clearInterval(timer);
+      } else {
+        element.textContent = Math.round(current);
+      }
+    }, 16);
+  };
+  
+  const getHistory = () => {
+    return JSON.parse(localStorage.getItem('uploadHistory'));
+  };
+  
+  const addToHistory = (fileName, fileUrl, fileSize, version) => {
+    const history = getHistory();
+    const date = new Date().toLocaleString('id-ID', { 
+      day: 'numeric', 
+      month: 'short', 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+    
+    const newEntry = {
+      id: Date.now(),
+      fileName,
+      fileUrl,
+      fileSize,
+      version,
+      date
+    };
+    
+    history.unshift(newEntry);
+    
+    // Limit history to 50 items
+    if (history.length > 50) {
+      history.pop();
+    }
+    
+    localStorage.setItem('uploadHistory', JSON.stringify(history));
+    renderHistory();
+  };
+  
+  const renderHistory = () => {
+    const history = getHistory();
+    const historyList = document.querySelector('#history-tab .history-list');
+    const sidebarHistory = document.querySelector('.sidebar .history-list');
+    
+    // Clear existing content
+    historyList.innerHTML = '';
+    sidebarHistory.innerHTML = '';
+    
+    if (history.length === 0) {
+      historyList.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem 0;">Belum ada riwayat upload</p>';
+      sidebarHistory.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 1rem 0;">Belum ada riwayat upload</p>';
+      return;
+    }
+    
+    // Render history items
+    history.forEach((item, index) => {
+      const historyItem = document.createElement('div');
+      historyItem.className = 'history-item';
+      historyItem.innerHTML = `
+        <div class="history-file">
+          <i class="fas fa-file"></i>
+          <a href="${item.fileUrl}" target="_blank">${item.fileName}</a>
+        </div>
+        <div class="history-date">${item.date}</div>
+      `;
+      
+      // Add to main history tab
+      historyList.appendChild(historyItem.cloneNode(true));
+      
+      // Add to sidebar history (limit to 5)
+      if (index < 5) {
+        sidebarHistory.appendChild(historyItem.cloneNode(true));
+      }
+    });
+  };
+  
+  const clearHistory = () => {
+    if (confirm('Apakah Anda yakin ingin menghapus semua riwayat upload?')) {
+      localStorage.setItem('uploadHistory', JSON.stringify([]));
+      renderHistory();
+      showToast('Riwayat upload telah dihapus', 'success');
+    }
+  };
+  
+  // --- TAB FUNCTIONALITY ---
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const tabId = tab.getAttribute('data-tab');
+      
+      tabs.forEach(t => t.classList.remove('active'));
+      tabContents.forEach(tc => tc.classList.remove('active'));
+      
+      tab.classList.add('active');
+      document.getElementById(`${tabId}-tab`).classList.add('active');
+    });
+  });
 
   // --- EVENT LISTENERS FOR FILE & API KEY ---
   apiKeyInput.addEventListener('input', updateButtonState);
@@ -406,33 +972,54 @@ document.addEventListener('DOMContentLoaded', () => {
     const files = dt.files;
     fileInput.files = files;
     updateButtonState();
-    document.getElementById('descUpload').textContent = `File dipilih: ${files[0].name}`;
+    showFileInfo(files[0]);
   }, false);
 
   fileInput.addEventListener('change', () => {
     if (fileInput.files.length > 0) {
-      document.getElementById('descUpload').textContent = `File dipilih: ${fileInput.files[0].name}`;
+      showFileInfo(fileInput.files[0]);
     } else {
-      document.getElementById('descUpload').textContent = 'Drag & Drop file ke sini atau klik untuk memilih';
+      hideFileInfo();
     }
     updateButtonState();
   });
+
+  removeFileBtn.addEventListener('click', () => {
+    fileInput.value = '';
+    hideFileInfo();
+    updateButtonState();
+  });
+
+  clearHistoryBtn.addEventListener('click', clearHistory);
+
+  function showFileInfo(file) {
+    fileName.textContent = file.name;
+    fileSize.textContent = formatFileSize(file.size);
+    fileInfo.style.display = 'flex';
+    document.getElementById('descUpload').textContent = 'Klik atau drag & drop untuk mengganti file';
+  }
+
+  function hideFileInfo() {
+    fileInfo.style.display = 'none';
+    document.getElementById('descUpload').textContent = 'Drag & Drop file ke sini atau klik untuk memilih';
+  }
 
   // --- FORM SUBMISSION & UPLOAD LOGIC ---
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const file = fileInput.files[0];
     const apiKey = apiKeyInput.value.trim();
+    const selectedVersion = document.querySelector('input[name="version"]:checked').value;
 
     if (!file || !apiKey) {
       showError('Mohon pilih file dan masukkan API Key.');
       return;
     }
 
-    handleUpload(file, apiKey);
+    handleUpload(file, apiKey, selectedVersion);
   });
 
-  const handleUpload = (file, apiKey) => {
+  const handleUpload = (file, apiKey, version) => {
     const formData = new FormData();
     formData.append('file', file);
     
@@ -442,13 +1029,12 @@ document.addEventListener('DOMContentLoaded', () => {
     progressContainer.style.display = 'block';
     progressBar.style.width = '0%';
     uploadBtn.disabled = true;
-    uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Mengunggah...</span>';
+    uploadBtn.innerHTML = '<span class="loading-spinner"></span> <span>Mengunggah...</span>';
 
-    // Using XMLHttpRequest for progress tracking
     const xhr = new XMLHttpRequest();
     
-    // API endpoint v1 or v2, you can add a selector for this
-    const url = `/api/v1/upload?apikey=${encodeURIComponent(apiKey)}`;
+    // URL API sekarang dinamis berdasarkan versi yang dipilih
+    const url = `/api/${version}/upload?apikey=${encodeURIComponent(apiKey)}`;
 
     xhr.open('POST', url, true);
 
@@ -468,7 +1054,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (xhr.status === 200) {
         const response = JSON.parse(xhr.responseText);
         if (response.success) {
-          showSuccess(response.result.url);
+          showSuccess(response.result);
+          updateStats(file.size);
+          addToHistory(file.name, response.result.url, file.size, version);
         } else {
           showError(response.message || 'Terjadi kesalahan yang tidak diketahui.');
         }
@@ -494,10 +1082,20 @@ document.addEventListener('DOMContentLoaded', () => {
     xhr.send(formData);
   };
 
-  const showSuccess = (url) => {
-    resultLink.href = url;
-    resultLink.textContent = url;
+  const showSuccess = (result) => {
+    resultLink.href = result.url;
+    resultLink.textContent = result.url;
     resultDiv.style.display = 'block';
+
+    // Tampilkan info kedaluwarsa jika ada (untuk v2)
+    if (result.expired) {
+      const expiryDate = new Date(result.expired).toLocaleString('id-ID');
+      expiryInfo.textContent = `Link kadaluwarsa pada: ${expiryDate}`;
+      expiryInfo.style.display = 'block';
+    } else {
+      expiryInfo.style.display = 'none';
+    }
+
     showToast('File berhasil diunggah!', 'success');
   };
 
@@ -516,6 +1114,10 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast('Gagal menyalin link.', 'error');
     });
   });
+
+  // --- INITIALIZE STATS AND HISTORY ---
+  renderStats();
+  renderHistory();
 });
 </script>
 </body>

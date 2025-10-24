@@ -5,281 +5,518 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="description" content="Upload file cepat dan aman menggunakan YUDZ Uploader." />
 <title>YUDZ UPLOADER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <style>
   :root {
-  --primary: #3b82f6;
-  --primary-dark: #2563eb;
-  --secondary: #8b5cf6;
-  --success: #10b981;
-  --dark: #0f172a;
-  --light: #f8fafc;
-  --gray: #94a3b8;
-  --card-bg: rgba(15, 23, 42, 0.75);
-}
+    --bg-color: #0f0f23;
+    --surface-color: #1a1a2e;
+    --primary-color: #00d9ff;
+    --text-color: #e0e0e0;
+    --error-color: #ff4757;
+    --success-color: #2ed573;
+    --border-color: #2a2a4a;
+  }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-body {
-  background: linear-gradient(135deg, #1e3a8a, #7e22ce, #1e3a8a);
-  color: var(--light);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 2rem;
-}
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
 
-#particle-canvas {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  z-index: 0;
-  pointer-events: none;
-}
+  #particle-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.5;
+  }
 
-.container {
-  background: var(--card-bg);
-  backdrop-filter: blur(15px);
-  border-radius: 2rem;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-  width: 100%;
-  max-width: 480px;
-  padding: 2rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  position: relative;
-  z-index: 1;
-}
+  .container {
+    background-color: var(--surface-color);
+    padding: 2rem 3rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 500px;
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(10px);
+  }
 
-h2 {
-  font-size: 2rem;
-  text-align: center;
-  background: linear-gradient(to right, var(--primary), var(--secondary));
-  -webkit-background-clip: text;
-  color: transparent;
-  text-shadow: 0 0 10px var(--primary);
-  animation: glow 2s infinite alternate;
-}
+  h2 {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 2rem;
+  }
 
-#dropArea {
-  border: 3px dashed var(--primary);
-  padding: 2.2rem 1.2rem;
-  border-radius: 1.5rem;
-  text-align: center;
-  background: rgba(15,23,42,0.55);
-  cursor: pointer;
-  transition: background 0.3s ease, border-color 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 6rem;
-}
+  .subtitle {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    color: #a0a0a0;
+  }
 
-#dropArea.dragover {
-  background: rgba(139,92,246,0.15);
-  border-color: var(--secondary);
-}
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
 
-#dropArea p {
-  color: var(--primary);
-  font-size: 1rem;
-}
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 
-#dropArea input[type="file"] { display: none; }
+  label {
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
 
-button {
-  background: linear-gradient(to right, var(--primary), var(--secondary));
-  border: none;
-  padding: 0.85rem 1rem;
-  color: white;
-  font-weight: 600;
-  font-size: 1rem;
-  border-radius: 0.9rem;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(59,130,246,0.4);
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  justify-content: center;
-  width: 100%;
-  margin-top: 1rem;
-}
+  input[type="text"] {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: #252541;
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
 
-button:hover:not(:disabled) {
-  background: linear-gradient(to right, var(--primary-dark), #7c3aed);
-  box-shadow: 0 8px 24px rgba(124,58,237,0.6);
-}
+  input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.2);
+  }
 
-button:disabled {
-  background: #4b5563;
-  cursor: not-allowed;
-  box-shadow: none;
-}
+  #dropArea {
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #252541;
+  }
 
-#loader {
-  display: none;
-  border: 6px solid rgba(30,41,59,0.8);
-  border-top: 6px solid var(--primary);
-  border-radius: 50%;
-  width: 3rem;
-  height: 3rem;
-  animation: spin 1s linear infinite;
-  margin: 1.5rem auto 0 auto;
-}
+  #dropArea:hover, #dropArea.dragover {
+    border-color: var(--primary-color);
+    background-color: rgba(0, 217, 255, 0.05);
+  }
 
-#result, #error {
-  text-align: center;
-  word-break: break-word;
-  font-size: 1rem;
-  padding: 0 0.5rem;
-}
+  #dropArea i {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+  }
 
-#result { color: var(--success); }
-#error { color: #ff6b6b; }
+  #fileInput {
+    display: none;
+  }
 
-.result-card {
-  background: rgba(15,23,42,0.7);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 1.2rem;
-  padding: 1.2rem 1.5rem;
-  margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  animation: fadeIn 0.5s ease;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+  button {
+    padding: 0.9rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--primary-color);
+    color: var(--bg-color);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
 
-.result-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 35px rgba(0,0,0,0.5);
-}
+  button:hover:not(:disabled) {
+    background-color: #00b8e6;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 217, 255, 0.4);
+  }
 
-.result-card a.result-link {
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
+  button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 
-.result-card a.result-link i { font-size: 1.2rem; }
+  #progressContainer {
+    width: 100%;
+    height: 8px;
+    background-color: #252541;
+    border-radius: 4px;
+    overflow: hidden;
+    display: none; /* Hidden by default */
+  }
 
-#toast {
-  position: fixed;
-  bottom: 2rem;
-  background: var(--card-bg);
-  color: var(--success);
-  padding: 0.75rem 1.25rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 0 15px var(--success);
-  display: none;
-  animation: fadeIn 0.5s ease-in-out;
-  left: 50%;
-  transform: translateX(-50%);
-  font-weight: 600;
-  z-index: 999;
-  max-width: 90vw;
-  word-wrap: break-word;
-}
+  #progressBar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary-color), #00f2fe);
+    border-radius: 4px;
+    transition: width 0.2s ease;
+  }
 
-@keyframes glow { from {text-shadow:0 0 10px var(--primary);} to {text-shadow:0 0 20px var(--secondary),0 0 30px var(--primary);} }
-@keyframes spin { to {transform:rotate(360deg);} }
-@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+  #result, #error {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 8px;
+    display: none;
+    word-wrap: break-word;
+  }
 
-@media (max-width: 480px){
-  .container { padding: 1.2rem 1rem; gap: 1rem; border-radius: 1rem; }
-  h2 { font-size: 1.6rem; }
-  #dropArea { padding: 1.5rem 1rem; min-height:5rem; }
-  button { font-size:0.95rem; padding:0.6rem 0.9rem; }
-  #loader { width:2.5rem; height:2.5rem; border-width:5px; margin:1rem auto 0 auto; }
-  #result, #error { font-size:0.95rem; padding:0 0.3rem; }
-  #toast { bottom:1.5rem; font-size:0.85rem; max-width:95vw; }
-}
+  #result {
+    border: 1px solid var(--success-color);
+    background-color: rgba(46, 213, 115, 0.1);
+  }
+
+  #result h3 {
+    color: var(--success-color);
+    margin-bottom: 0.5rem;
+  }
+
+  #result a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  #result a:hover {
+    text-decoration: underline;
+  }
+
+  #result button {
+    margin-top: 1rem;
+    background-color: var(--success-color);
+    color: white;
+  }
+
+  #error {
+    border: 1px solid var(--error-color);
+    background-color: rgba(255, 71, 87, 0.1);
+    color: var(--error-color);
+  }
+
+  #toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.4s ease;
+    z-index: 1000;
+  }
+
+  #toast.show {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  #toast.success { background-color: var(--success-color); }
+  #toast.error { background-color: var(--error-color); }
+
+  @media (max-width: 600px) {
+    .container {
+      padding: 1.5rem;
+      margin: 1rem;
+    }
+    h2 {
+      font-size: 1.8rem;
+    }
+  }
 </style>
 </head>
 <body>
 <canvas id="particle-canvas" aria-hidden="true"></canvas>
 <div class="container" role="main">
   <h2><i class="fas fa-cloud-upload-alt" aria-hidden="true"></i> CDN-YUDZ</h2>
+  <p class="subtitle">Upload file Anda dengan cepat dan aman</p>
+  
   <form id="uploadForm" aria-describedby="descUpload">
-    <label id="dropArea" for="fileInput" tabindex="0" role="button" aria-label="Drag dan drop file ke sini atau klik untuk memilih file">
-      <p id="descUpload">Drag & Drop file ke sini atau klik untuk memilih file</p>
-      <input type="file" id="fileInput" name="file" accept="*/*" required aria-required="true" />
-    </label>
-    <button type="submit" id="uploadBtn" disabled aria-disabled="true"><i class="fas fa-upload"></i> Upload</button>
-    <div id="loader" role="status" aria-live="polite" aria-label="Loading"></div>
+    <div class="input-group">
+      <label for="apiKeyInput">API Key</label>
+      <input type="text" id="apiKeyInput" name="apikey" placeholder="Masukkan API Key Anda" required aria-required="true">
+    </div>
+
+    <div class="input-group">
+      <label id="dropArea" for="fileInput" tabindex="0" role="button" aria-label="Drag dan drop file ke sini atau klik untuk memilih file">
+        <i class="fas fa-cloud-arrow-up"></i>
+        <p id="descUpload">Drag & Drop file ke sini atau klik untuk memilih</p>
+        <input type="file" id="fileInput" name="file" accept="*/*" required aria-required="true" />
+      </label>
+    </div>
+
+    <button type="submit" id="uploadBtn" disabled aria-disabled="true">
+      <i class="fas fa-upload"></i> <span>Upload File</span>
+    </button>
+    
+    <div id="progressContainer" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Upload progress">
+      <div id="progressBar"></div>
+    </div>
   </form>
-  <div id="result" role="alert" aria-live="polite"></div>
+
+  <div id="result" role="alert" aria-live="polite">
+    <h3><i class="fas fa-check-circle"></i> Upload Berhasil!</h3>
+    <p>Link File:</p>
+    <a id="resultLink" href="#" target="_blank"></a>
+    <button id="copyBtn"><i class="fas fa-copy"></i> Salin Link</button>
+  </div>
+  
   <div id="error" role="alert" aria-live="assertive"></div>
 </div>
+
 <div id="toast" role="alert" aria-live="polite" aria-atomic="true"></div>
 
 <script>
-(function(){
-  const form=document.getElementById('uploadForm');
-  const dropArea=document.getElementById('dropArea');
-  const fileInput=document.getElementById('fileInput');
-  const resultDiv=document.getElementById('result');
-  const errorDiv=document.getElementById('error');
-  const loader=document.getElementById('loader');
-  const toast=document.getElementById('toast');
-  const uploadBtn=document.getElementById('uploadBtn');
+document.addEventListener('DOMContentLoaded', () => {
+  // --- ELEMENT SELECTION ---
+  const form = document.getElementById('uploadForm');
+  const fileInput = document.getElementById('fileInput');
+  const apiKeyInput = document.getElementById('apiKeyInput');
+  const dropArea = document.getElementById('dropArea');
+  const uploadBtn = document.getElementById('uploadBtn');
+  const progressContainer = document.getElementById('progressContainer');
+  const progressBar = document.getElementById('progressBar');
+  const resultDiv = document.getElementById('result');
+  const resultLink = document.getElementById('resultLink');
+  const copyBtn = document.getElementById('copyBtn');
+  const errorDiv = document.getElementById('error');
+  const toast = document.getElementById('toast');
 
-  function showToast(msg){toast.textContent=msg; toast.style.display='block'; setTimeout(()=>{toast.style.display='none';},3000);}
-  fileInput.addEventListener('change',()=>{uploadBtn.disabled=!fileInput.files.length; uploadBtn.setAttribute('aria-disabled',String(uploadBtn.disabled)); resultDiv.textContent=''; errorDiv.textContent='';});
-  ['dragenter','dragover'].forEach(e=>dropArea.addEventListener(e,a=>{a.preventDefault(); dropArea.classList.add('dragover');}));
-  ['dragleave','drop'].forEach(e=>dropArea.addEventListener(e,a=>{a.preventDefault(); dropArea.classList.remove('dragover');}));
-  dropArea.addEventListener('drop',e=>{e.preventDefault(); if(e.dataTransfer.files.length){fileInput.files=e.dataTransfer.files; uploadBtn.disabled=false; uploadBtn.setAttribute('aria-disabled','false'); resultDiv.textContent=''; errorDiv.textContent='';}});
-  dropArea.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault(); fileInput.click();}});
-  
-  form.addEventListener('submit',async e=>{
-    e.preventDefault();
-    const file=fileInput.files[0]; 
-    if(!file){ errorDiv.textContent='Silakan pilih file terlebih dahulu.'; return;}
-    if(file.size>100*1024*1024){ errorDiv.textContent='File terlalu besar. Maksimal 100MB.'; return;}
-    loader.style.display='block'; uploadBtn.disabled=true; resultDiv.textContent=''; errorDiv.textContent='';
+  // --- PARTICLE CANVAS ---
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let particlesArray = [];
 
-    const formData=new FormData(); formData.append('file',file);
-    try{
-      const res=await fetch('https://apiku.x-server.my.id/api/v1/upload',{method:'POST',body:formData});
-      const data=await res.json();
-      loader.style.display='none'; uploadBtn.disabled=false;
-      if(res.ok && data?.result?.url){
-        const url=data.result.url;
-        resultDiv.innerHTML=`<div class="result-card"><p><strong>File berhasil diupload!</strong></p>
-        <a href="${url}" class="result-link" target="_blank"><i class="fas fa-file-upload"></i> ${file.name}</a>
-        <button id="copyBtn"><i class="fas fa-copy"></i> Salin Link</button></div>`;
-        document.getElementById('copyBtn').addEventListener('click',()=>{navigator.clipboard.writeText(url).then(()=>showToast('URL berhasil disalin!')).catch(()=>showToast('Gagal menyalin URL.'));});
-      }else errorDiv.textContent=data.message||'Upload gagal.';
-    }catch(err){loader.style.display='none'; uploadBtn.disabled=false; errorDiv.textContent='Terjadi kesalahan saat mengunggah file.'; console.error(err);}
-  });
-})();
-
-(() => {
-  const canvas=document.getElementById('particle-canvas');
-  const ctx=canvas.getContext('2d');
-  function resize(){canvas.width=window.innerWidth; canvas.height=window.innerHeight;}
-  resize(); window.addEventListener('resize',resize);
-  class Particle{
-    constructor(){this.reset();}
-    reset(){this.x=Math.random()*canvas.width; this.y=Math.random()*canvas.height; this.size=Math.random()*2+1; this.speedX=(Math.random()-0.5)*0.5; this.speedY=(Math.random()-0.5)*0.5; this.opacity=Math.random()*0.5+0.3;}
-    update(){this.x+=this.speedX; this.y+=this.speedY; if(this.x<0)this.x=canvas.width; else if(this.x>canvas.width)this.x=0; if(this.y<0)this.y=canvas.height; else if(this.y>canvas.height)this.y=0;}
-    draw(){ctx.beginPath(); ctx.fillStyle=`rgba(255,255,255,${this.opacity})`; ctx.shadowColor='rgba(255,255,255,0.7)'; ctx.shadowBlur=4; ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill();}
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 3 + 1;
+      this.speedX = Math.random() * 0.5 - 0.25;
+      this.speedY = Math.random() * 0.5 - 0.25;
+    }
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      if (this.x > canvas.width) this.x = 0;
+      if (this.x < 0) this.x = canvas.width;
+      if (this.y > canvas.height) this.y = 0;
+      if (this.y < 0) this.y = canvas.height;
+    }
+    draw() {
+      ctx.fillStyle = 'rgba(0, 217, 255, 0.8)';
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
-  const particles=[]; for(let i=0;i<100;i++){particles.push(new Particle());}
-  function animate(){ctx.clearRect(0,0,canvas.width,canvas.height); for(const p of particles){p.update(); p.draw();} requestAnimationFrame(animate);}
-  animate();
-})();
+
+  function initParticles() {
+    particlesArray = [];
+    for (let i = 0; i < 100; i++) {
+      particlesArray.push(new Particle());
+    }
+  }
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particlesArray.forEach(particle => {
+      particle.update();
+      particle.draw();
+    });
+    requestAnimationFrame(animateParticles);
+  }
+  initParticles();
+  animateParticles();
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    initParticles();
+  });
+
+  // --- HELPER FUNCTIONS ---
+  const showToast = (message, type) => {
+    toast.textContent = message;
+    toast.className = type; // 'success' or 'error'
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  };
+
+  const updateButtonState = () => {
+    if (fileInput.files.length > 0 && apiKeyInput.value.trim() !== '') {
+      uploadBtn.disabled = false;
+      uploadBtn.setAttribute('aria-disabled', 'false');
+    } else {
+      uploadBtn.disabled = true;
+      uploadBtn.setAttribute('aria-disabled', 'true');
+    }
+  };
+
+  // --- EVENT LISTENERS FOR FILE & API KEY ---
+  apiKeyInput.addEventListener('input', updateButtonState);
+  
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults, false);
+    document.body.addEventListener(eventName, preventDefaults, false);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropArea.addEventListener(eventName, () => dropArea.classList.add('dragover'), false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, () => dropArea.classList.remove('dragover'), false);
+  });
+
+  dropArea.addEventListener('drop', (e) => {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    fileInput.files = files;
+    updateButtonState();
+    document.getElementById('descUpload').textContent = `File dipilih: ${files[0].name}`;
+  }, false);
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      document.getElementById('descUpload').textContent = `File dipilih: ${fileInput.files[0].name}`;
+    } else {
+      document.getElementById('descUpload').textContent = 'Drag & Drop file ke sini atau klik untuk memilih';
+    }
+    updateButtonState();
+  });
+
+  // --- FORM SUBMISSION & UPLOAD LOGIC ---
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const file = fileInput.files[0];
+    const apiKey = apiKeyInput.value.trim();
+
+    if (!file || !apiKey) {
+      showError('Mohon pilih file dan masukkan API Key.');
+      return;
+    }
+
+    handleUpload(file, apiKey);
+  });
+
+  const handleUpload = (file, apiKey) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    // Reset UI
+    resultDiv.style.display = 'none';
+    errorDiv.style.display = 'none';
+    progressContainer.style.display = 'block';
+    progressBar.style.width = '0%';
+    uploadBtn.disabled = true;
+    uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Mengunggah...</span>';
+
+    // Using XMLHttpRequest for progress tracking
+    const xhr = new XMLHttpRequest();
+    
+    // API endpoint v1 or v2, you can add a selector for this
+    const url = `/api/v1/upload?apikey=${encodeURIComponent(apiKey)}`;
+
+    xhr.open('POST', url, true);
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const percentComplete = (e.loaded / e.total) * 100;
+        progressBar.style.width = `${percentComplete}%`;
+        progressContainer.setAttribute('aria-valuenow', Math.round(percentComplete));
+      }
+    };
+
+    xhr.onload = () => {
+      uploadBtn.disabled = false;
+      uploadBtn.innerHTML = '<i class="fas fa-upload"></i> <span>Upload File</span>';
+      progressContainer.style.display = 'none';
+
+      if (xhr.status === 200) {
+        const response = JSON.parse(xhr.responseText);
+        if (response.success) {
+          showSuccess(response.result.url);
+        } else {
+          showError(response.message || 'Terjadi kesalahan yang tidak diketahui.');
+        }
+      } else {
+        let errorMessage = `Gagal mengunggah file. Status: ${xhr.status}`;
+        try {
+          const errorResponse = JSON.parse(xhr.responseText);
+          errorMessage = errorResponse.message || errorMessage;
+        } catch (e) {
+          // Ignore JSON parse error
+        }
+        showError(errorMessage);
+      }
+    };
+
+    xhr.onerror = () => {
+      uploadBtn.disabled = false;
+      uploadBtn.innerHTML = '<i class="fas fa-upload"></i> <span>Upload File</span>';
+      progressContainer.style.display = 'none';
+      showError('Jaringan error. Silakan coba lagi.');
+    };
+
+    xhr.send(formData);
+  };
+
+  const showSuccess = (url) => {
+    resultLink.href = url;
+    resultLink.textContent = url;
+    resultDiv.style.display = 'block';
+    showToast('File berhasil diunggah!', 'success');
+  };
+
+  const showError = (message) => {
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+    showToast(message, 'error');
+  };
+
+  // --- COPY TO CLIPBOARD ---
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(resultLink.href).then(() => {
+      showToast('Link berhasil disalin!', 'success');
+    }).catch(err => {
+      console.error('Gagal menyalin link: ', err);
+      showToast('Gagal menyalin link.', 'error');
+    });
+  });
+});
 </script>
 </body>
 </html>

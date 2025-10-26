@@ -375,12 +375,23 @@
     gap: 0.75rem;
     font-size: 0.95rem;
     font-weight: 500;
+    flex: 1;
+    min-width: 0; /* Important for text truncation */
+  }
+
+  .file-name span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px; /* Adjust based on your layout */
   }
 
   .file-size {
     color: var(--text-secondary);
     font-size: 0.9rem;
     font-family: 'JetBrains Mono', monospace;
+    flex-shrink: 0;
+    margin-left: 0.5rem;
   }
 
   .remove-file {
@@ -391,6 +402,7 @@
     padding: 0.5rem;
     border-radius: 6px;
     transition: var(--transition);
+    flex-shrink: 0;
   }
 
   .remove-file:hover {
@@ -670,6 +682,8 @@
     align-items: center;
     gap: 0.75rem;
     font-size: 0.95rem;
+    flex: 1;
+    min-width: 0; /* Important for text truncation */
   }
 
   .history-file a {
@@ -677,6 +691,10 @@
     text-decoration: none;
     font-weight: 500;
     transition: var(--transition);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px; /* Adjust based on your layout */
   }
 
   .history-file a:hover {
@@ -687,6 +705,8 @@
     font-size: 0.85rem;
     color: var(--text-secondary);
     font-family: 'JetBrains Mono', monospace;
+    flex-shrink: 0;
+    margin-left: 0.5rem;
   }
 
   .loading-spinner {
@@ -736,6 +756,31 @@
     color: var(--primary-color);
   }
 
+  /* Tooltip for full filename */
+  .file-tooltip {
+    position: relative;
+  }
+
+  .file-tooltip:hover::after {
+    content: attr(data-fullname);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--surface-tertiary);
+    color: var(--text-color);
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: var(--shadow);
+    max-width: 300px;
+    word-wrap: break-word;
+    white-space: normal;
+    margin-bottom: 0.5rem;
+  }
+
   @media (max-width: 992px) {
     .app-container {
       flex-direction: column;
@@ -762,6 +807,14 @@
     
     .version-selector {
       flex-direction: column;
+    }
+
+    .file-name span {
+      max-width: 150px;
+    }
+
+    .history-file a {
+      max-width: 120px;
     }
   }
 </style>
@@ -829,7 +882,7 @@
             <div id="fileInfo" class="file-info" style="display: none;">
               <div class="file-name">
                 <i class="fas fa-file"></i>
-                <span id="fileName"></span>
+                <span id="fileName" class="file-tooltip"></span>
               </div>
               <div class="file-size" id="fileSize"></div>
               <button type="button" id="removeFile" class="remove-file" aria-label="Remove file">
@@ -1087,6 +1140,20 @@ document.addEventListener('DOMContentLoaded', () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
+  const truncateFilename = (filename, maxLength = 30) => {
+    if (filename.length <= maxLength) return filename;
+    
+    const extension = filename.substring(filename.lastIndexOf('.'));
+    const nameWithoutExt = filename.substring(0, filename.lastIndexOf('.'));
+    
+    if (nameWithoutExt.length <= maxLength - extension.length - 3) {
+      return filename;
+    }
+    
+    const truncatedName = nameWithoutExt.substring(0, maxLength - extension.length - 3);
+    return truncatedName + '...' + extension;
+  };
+
   // --- LOCALSTORAGE FUNCTIONS ---
   const getStats = () => {
     return JSON.parse(localStorage.getItem('uploadStats'));
@@ -1195,10 +1262,13 @@ document.addEventListener('DOMContentLoaded', () => {
     history.forEach((item, index) => {
       const historyItem = document.createElement('div');
       historyItem.className = 'history-item';
+      
+      const truncatedName = truncateFilename(item.fileName, 25);
+      
       historyItem.innerHTML = `
         <div class="history-file">
           <i class="fas fa-file"></i>
-          <a href="${item.fileUrl}" target="_blank">${item.fileName}</a>
+          <a href="${item.fileUrl}" target="_blank" class="file-tooltip" data-fullname="${item.fileName}">${truncatedName}</a>
         </div>
         <div class="history-date">${item.date}</div>
       `;
@@ -1208,7 +1278,10 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Add to sidebar history (limit to 5)
       if (index < 5) {
-        sidebarHistory.appendChild(historyItem.cloneNode(true));
+        const sidebarItem = historyItem.cloneNode(true);
+        const sidebarLink = sidebarItem.querySelector('a');
+        sidebarLink.textContent = truncateFilename(item.fileName, 18);
+        sidebarHistory.appendChild(sidebarItem);
       }
     });
   };
@@ -1281,7 +1354,11 @@ document.addEventListener('DOMContentLoaded', () => {
   clearHistoryBtn.addEventListener('click', clearHistory);
 
   function showFileInfo(file) {
-    fileName.textContent = file.name;
+    const fullName = file.name;
+    const truncatedName = truncateFilename(fullName, 30);
+    
+    fileName.textContent = truncatedName;
+    fileName.setAttribute('data-fullname', fullName);
     fileSize.textContent = formatFileSize(file.size);
     fileInfo.style.display = 'flex';
     document.getElementById('descUpload').textContent = 'Klik atau drag & drop untuk mengganti file';
